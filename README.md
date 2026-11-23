@@ -25,8 +25,12 @@ Everything else — providers, layout, CLI, local API — is upstream v0.7.16 be
 
 ## Install
 
-There is no notarized download; this is a personal build. Requires macOS 15+ and
-the Xcode command line tools.
+**Download:** grab `OpenQuota-0.7.16.zip` from the
+[latest release](https://github.com/hxutixnnn/OpenQuota/releases/latest), unzip it and drag
+`OpenQuota.app` to Applications. It is ad-hoc signed, not notarized: on first launch,
+right-click the app and choose **Open**.
+
+**From source:** requires macOS 15+ and the Xcode command line tools.
 
 ```sh
 git clone https://github.com/hxutixnnn/OpenQuota.git
@@ -41,16 +45,16 @@ cp -R dist/OpenQuota.app /Applications/
 
 The build is ad-hoc signed, which has two consequences: iCloud sync stays off, and
 in-app updates are disabled (there is no Sparkle feed). `brew upgrade --cask
-openquota` will overwrite it with upstream.
+openusage` installs upstream over it.
 
-Staging with the default `com.hxutixnnn.openquota` bundle id keeps an existing OpenQuota
-install's settings, pins and sign-ins; use `BUNDLE_ID=com.robinebers.openquota` to keep the
-fork's settings separate.
+The default bundle id is `com.hxutixnnn.openquota`. Passing
+`BUNDLE_ID=com.robinebers.openusage` inherits an existing OpenUsage install's settings,
+pins and sign-ins instead of starting fresh.
 
 ## Supported providers
 
 - **[Antigravity](docs/providers/antigravity.md)** — shared Gemini and Claude pool quotas, 5-hour and weekly windows, plus Prompt/Flow credits
-- **[Abacus.AI](Sources/OpenQuota/Providers/AbacusAI)** — monthly account credits from the `abacusai` CLI
+- **[Abacus.AI](Sources/OpenUsage/Providers/AbacusAI)** — monthly account credits from the `abacusai` CLI
 - **[Claude](docs/providers/claude.md)** — session, weekly, model-specific limits, extra usage, local daily spend
 - **[Codex](docs/providers/codex.md)** — session, weekly, credits, local daily spend
 - **[Copilot](docs/providers/copilot.md)** — AI credits, extra usage, organization billing, chat and completions

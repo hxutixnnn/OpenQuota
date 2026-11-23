@@ -5,7 +5,7 @@ pieces below make sense.
 
 ## What a provider is
 
-A provider is a small Swift module under `Sources/OpenQuota/Providers/<Name>/` that conforms to
+A provider is a small Swift module under `Sources/OpenUsage/Providers/<Name>/` that conforms to
 `ProviderRuntime`. It has three parts:
 
 - an **auth store** that reads credentials already on the user's machine (config files, keychain),
@@ -53,7 +53,7 @@ factory only when there is no typed error, and never return stale or empty data 
 
 1. **Check first.** Look at open issues and `docs/providers/` to see if the provider is already requested
    or in progress.
-2. **Create the module.** Add `Sources/OpenQuota/Providers/<Name>/` with the auth store, usage client, and
+2. **Create the module.** Add `Sources/OpenUsage/Providers/<Name>/` with the auth store, usage client, and
    mapper, conforming to `ProviderRuntime` — both `refresh()` and `hasLocalCredentials()` (the compiler
    enforces the latter; there is no default). The probe must stay local-only and reuse the same auth-store
    loaders and credential-usability filters that `refresh()` starts with — don't write a second

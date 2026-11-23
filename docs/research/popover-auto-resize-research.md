@@ -3,9 +3,9 @@
 > **Historical / superseded.** This 2026-06-25 research preceded the coordinated content-driven panel
 > resize that shipped later that day and was subsequently refined. See the current
 > [AppKit bridge](../architecture.md#the-appkit-bridge),
-> [`DashboardView.swift`](../../Sources/OpenQuota/Views/DashboardView.swift),
-> [`PanelHeightCoordinator.swift`](../../Sources/OpenQuota/Views/PanelHeightCoordinator.swift), and
-> [`PanelHeightController.swift`](../../Sources/OpenQuota/App/PanelHeightController.swift). The rejected
+> [`DashboardView.swift`](../../Sources/OpenUsage/Views/DashboardView.swift),
+> [`PanelHeightCoordinator.swift`](../../Sources/OpenUsage/Views/PanelHeightCoordinator.swift), and
+> [`PanelHeightController.swift`](../../Sources/OpenUsage/App/PanelHeightController.swift). The rejected
 > approaches and proposed file map below are preserved as historical research, not current setup
 > instructions.
 

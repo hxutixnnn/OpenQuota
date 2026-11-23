@@ -2,8 +2,8 @@
 
 > **Historical / superseded.** This design report guided the model-breakdown hover panel that shipped
 > on 2026-07-04. See [Dashboard rows](../../dashboard.md#rows),
-> [`HoverPopoverState.swift`](../../../Sources/OpenQuota/Views/HoverPopoverState.swift), and
-> [`ModelUsageDetail.swift`](../../../Sources/OpenQuota/Views/ModelUsageDetail.swift) for current
+> [`HoverPopoverState.swift`](../../../Sources/OpenUsage/Views/HoverPopoverState.swift), and
+> [`ModelUsageDetail.swift`](../../../Sources/OpenUsage/Views/ModelUsageDetail.swift) for current
 > behavior and implementation. References, line numbers, and proposed component names below remain
 > unchanged as a record of the design decision at that time.
 
@@ -22,7 +22,7 @@ Recommended direction: **a small SwiftUI `.popover` anchored to the hovered spen
 
 ## 1. The app's existing design language (concrete catalog)
 
-Read from `Sources/OpenQuota/Views/` + `Sources/OpenQuota/Stores/DensitySetting.swift` + `Sources/OpenQuota/Support/Theme.swift` + `Sources/OpenQuota/Support/LiquidGlassFallbacks.swift`. The new panel must match this.
+Read from `Sources/OpenUsage/Views/` + `Sources/OpenUsage/Stores/DensitySetting.swift` + `Sources/OpenUsage/Support/Theme.swift` + `Sources/OpenUsage/Support/LiquidGlassFallbacks.swift`. The new panel must match this.
 
 ### 1.1 Typography ramp (explicit point sizes, not semantic styles)
 
