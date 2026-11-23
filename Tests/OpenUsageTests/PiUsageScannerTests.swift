@@ -1,7 +1,7 @@
 import XCTest
 @testable import OpenUsage
 
-/// The pi log fold-in: parse pi's assistant usage lines, attribute them to the mapped OpenUsage card,
+/// The pi log fold-in: parse pi's assistant usage lines, attribute them to the mapped OpenQuota card,
 /// and price by pi's carried cost (else the engine). Also covers the shared scan-merge that folds the
 /// pi slice into a provider's native scan.
 final class PiUsageScannerTests: XCTestCase {

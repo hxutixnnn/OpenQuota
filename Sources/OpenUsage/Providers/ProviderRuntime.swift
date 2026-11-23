@@ -4,7 +4,7 @@ enum ProviderRefreshContext {
     @TaskLocal static var isManual = false
 }
 
-/// One AI provider OpenUsage can track. A conformer reads credentials already on the machine, calls the
+/// One AI provider OpenQuota can track. A conformer reads credentials already on the machine, calls the
 /// provider's API, and normalizes the result into a `ProviderSnapshot` of `MetricLine` values that the UI
 /// renders. See `docs/adding-a-provider.md` for the full walkthrough.
 ///

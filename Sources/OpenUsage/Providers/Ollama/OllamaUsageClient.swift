@@ -1,7 +1,7 @@
 import CryptoKit
 import Foundation
 
-/// Signs a request the way the `ollama` CLI does, so ollama.com accepts it from OpenUsage exactly as it
+/// Signs a request the way the `ollama` CLI does, so ollama.com accepts it from OpenQuota exactly as it
 /// would from Ollama itself.
 ///
 /// The challenge is `"<METHOD>,<request-uri>"` where the request URI carries a `ts` unix-seconds query

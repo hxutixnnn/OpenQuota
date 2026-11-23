@@ -93,7 +93,7 @@ enum CodexAuthError: Error, LocalizedError, Equatable {
 struct CodexAuthStore: Sendable {
     static let keychainService = "Codex Auth"
     /// Refresh once the access token is within this window of its JWT `exp` — the same 5-minute slack
-    /// the `codex` CLI itself uses, so OpenUsage rotates on the same schedule rather than guessing.
+    /// the `codex` CLI itself uses, so OpenQuota rotates on the same schedule rather than guessing.
     static let accessTokenRefreshWindow: TimeInterval = 5 * 60
     private static let authFile = "auth.json"
 

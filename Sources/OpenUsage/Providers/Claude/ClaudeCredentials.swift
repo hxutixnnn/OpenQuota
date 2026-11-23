@@ -9,7 +9,7 @@ struct ClaudeOAuth: Codable, Hashable, Sendable {
     var scopes: [String]?
 }
 
-/// Claude Code owns this document, including MCP logins and fields OpenUsage does not know about.
+/// Claude Code owns this document, including MCP logins and fields OpenQuota does not know about.
 /// Keep its original JSON alongside the typed view rather than re-encoding that partial model.
 struct ClaudeCredentialsFile: Hashable, Sendable {
     let claudeAiOauth: ClaudeOAuth?

@@ -117,32 +117,60 @@ struct AntigravityUsageClient: Sendable {
         return .unavailable
     }
 
-    /// POST a Cloud Code endpoint on each base URL and return every 2xx body in base-URL order.
+    /// POST a Cloud Code endpoint on every base URL **concurrently** and return each 2xx body.
     /// The hosts disagree in both directions: `daily-cloudcode-pa` has answered the quota summary with
     /// only the Claude group, and `cloudcode-pa` has answered with every bucket at 100% left while the
     /// daily host carried the real usage. So every host is asked and the caller merges by id, taking the
-    /// most-consumed reading. Any 2xx wins; otherwise a 401/403 on any base is `.authFailed`, and
-    /// anything else `.unavailable`.
+    /// most-consumed reading. Each host gets `hostTimeout` seconds, so a stalled host can't hold the
+    /// refresh past that. Any 2xx wins; else a 401/403 on any base is `.authFailed`, and anything else
+    /// `.unavailable`.
     func cloudCodeAllHosts(
         path: String,
         token: String,
         userAgent: String,
-        body: [String: String]
+        body: [String: String],
+        hostTimeout: TimeInterval = 4
     ) async -> CloudCodeAllHostsOutcome {
         let payload = (try? JSONSerialization.data(withJSONObject: body)) ?? Data("{}".utf8)
-        var responses: [HTTPResponse] = []
-        for base in Self.cloudCodeURLs {
-            guard let url = URL(string: base + path) else { continue }
-            let request = Self.cloudCodeRequest(url: url, token: token, userAgent: userAgent, payload: payload)
-            guard let response = try? await http.send(request) else { continue }
-            responses.append(response)
-            // Every host is asked: one can answer a complete-looking summary that reports 100% left for
-            // buckets the other host has real usage for, so no single body can end the loop.
+        let requests: [(index: Int, request: HTTPRequest)] = Self.cloudCodeURLs.enumerated().compactMap { index, base in
+            guard let url = URL(string: base + path) else { return nil }
+            return (index, Self.cloudCodeRequest(url: url, token: token, userAgent: userAgent, payload: payload))
         }
+        let client = http
+        var received: [Int: HTTPResponse] = [:]
+        await withTaskGroup(of: (Int, HTTPResponse?).self) { group in
+            for entry in requests {
+                group.addTask {
+                    (entry.index, await Self.send(entry.request, using: client, timeout: hostTimeout))
+                }
+            }
+            for await (index, response) in group {
+                if let response { received[index] = response }
+            }
+        }
+        let responses = received.sorted { $0.key < $1.key }.map(\.value)
         let bodies = responses.filter { (200..<300).contains($0.statusCode) }.map(\.body)
         if !bodies.isEmpty { return .ok(bodies) }
         if responses.contains(where: { $0.statusCode == 401 || $0.statusCode == 403 }) { return .authFailed }
         return .unavailable
+    }
+
+    /// One request raced against a deadline, so a slow or hung host yields `nil` instead of blocking.
+    private static func send(
+        _ request: HTTPRequest,
+        using client: HTTPClient,
+        timeout: TimeInterval
+    ) async -> HTTPResponse? {
+        await withTaskGroup(of: HTTPResponse?.self) { group in
+            group.addTask { try? await client.send(request) }
+            group.addTask {
+                try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+                return nil
+            }
+            let first = await group.next() ?? nil
+            group.cancelAll()
+            return first
+        }
     }
 
     private static func cloudCodeRequest(url: URL, token: String, userAgent: String, payload: Data) -> HTTPRequest {

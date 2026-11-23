@@ -14,7 +14,7 @@ Daily and Weekly start pinned to the menu bar on a fresh install. Extra Balance 
 
 If Devin supplies a weekly reset but omits the weekly percentage, the weekly quota is exhausted (100% used).
 
-When Devin reports your plan name, OpenUsage shows it beside the provider name.
+When Devin reports your plan name, OpenQuota shows it beside the provider name.
 
 ## Where credentials come from
 

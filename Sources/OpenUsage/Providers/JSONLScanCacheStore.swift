@@ -96,7 +96,7 @@ enum JSONLScanCachePaths {
 
     static var defaultDirectory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("OpenUsage/log-scan-cache", isDirectory: true)
+            .appendingPathComponent("OpenQuota/log-scan-cache", isDirectory: true)
     }
 
     static func identityDirectory(

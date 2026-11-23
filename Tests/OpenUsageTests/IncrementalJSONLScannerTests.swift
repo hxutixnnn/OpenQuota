@@ -403,7 +403,7 @@ final class IncrementalJSONLScannerTests: XCTestCase {
         // Users symlink log dirs into synced folders (`~/.claude/projects -> ~/Dropbox/...`);
         // `FileManager.enumerator` yields nothing for a symlinked root, so discovery must resolve it.
         let base = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageScannerSymlink-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("OpenQuotaScannerSymlink-\(UUID().uuidString)", isDirectory: true)
         let real = base.appendingPathComponent("real", isDirectory: true)
         try FileManager.default.createDirectory(at: real, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: base) }
@@ -432,7 +432,7 @@ final class IncrementalJSONLScannerTests: XCTestCase {
 
     private func makeDirectory(_ suffix: String) throws -> URL {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageScanner\(suffix)-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("OpenQuotaScanner\(suffix)-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
     }

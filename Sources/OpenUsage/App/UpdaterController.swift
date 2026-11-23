@@ -112,7 +112,7 @@ final class UpdaterController {
     /// User-initiated check. Shows Sparkle's standard UI (progress, release notes, install prompt).
     func checkForUpdates() {
         guard let controller else { return }
-        // Sparkle 2.9.4 also activates dockless apps with `ignoringOtherApps`, but promote OpenUsage
+        // Sparkle 2.9.4 also activates dockless apps with `ignoringOtherApps`, but promote OpenQuota
         // before handing control over so the activation-policy transition cannot leave Sparkle's
         // checking window behind the currently active app. The next-runloop handoff mirrors the
         // workaround verified in sparkle-project/Sparkle#2889.
@@ -235,7 +235,7 @@ final class UpdaterUserDriverDelegate: NSObject, SPUStandardUserDriverDelegate {
     var onUpdateResolved: (@MainActor @Sendable () -> Void)?
     /// Reasserts foreground activation immediately before Sparkle presents user-facing update UI.
     var onUpdateWillShow: (@MainActor @Sendable () -> Void)?
-    /// Restores OpenUsage to its normal dockless activation policy after Sparkle finishes the session.
+    /// Restores OpenQuota to its normal dockless activation policy after Sparkle finishes the session.
     var onUpdateSessionFinished: (@MainActor @Sendable () -> Void)?
 
     /// Opt into "gentle" reminders: as a menu-bar (accessory) app we don't want Sparkle stealing focus

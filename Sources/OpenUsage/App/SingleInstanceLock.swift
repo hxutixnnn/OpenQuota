@@ -29,7 +29,7 @@ enum SingleInstanceLock {
         }
     }
 
-    /// Locks `Application Support/OpenUsage/<bundle id>.lock` — a directory the app already uses
+    /// Locks `Application Support/OpenQuota/<bundle id>.lock` — a directory the app already uses
     /// for its own state, and stable no matter where the app bundle itself lives.
     static func acquire(bundleIdentifier: String) -> Acquisition {
         guard let appSupport = FileManager.default.urls(
@@ -39,7 +39,7 @@ enum SingleInstanceLock {
             return .failed("Application Support directory unavailable")
         }
         let lockURL = appSupport
-            .appendingPathComponent("OpenUsage", isDirectory: true)
+            .appendingPathComponent("OpenQuota", isDirectory: true)
             .appendingPathComponent("\(bundleIdentifier).lock")
         return acquire(at: lockURL)
     }

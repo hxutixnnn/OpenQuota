@@ -37,7 +37,7 @@ func makeAntigravityDatabaseDirectory(
     return (directory, paths)
 }
 
-/// Synthetic protobuf fixtures follow FelixIsaac's original regression coverage in openusage#1058.
+/// Synthetic protobuf fixtures follow FelixIsaac's original regression coverage in openquota#1058.
 func antigravityVarint(_ value: UInt64) -> [UInt8] {
     var remaining = value
     var encoded: [UInt8] = []

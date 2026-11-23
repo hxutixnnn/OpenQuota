@@ -22,7 +22,8 @@ final class AntigravityLayoutTests: XCTestCase {
         // Gemini pair, Argon Weekly, and trend above the fold; Claude and spend below the caret.
         let group = store.customizeGroups.first { $0.provider.id == "antigravity" }
         XCTAssertEqual(group?.alwaysShownMetrics.map(\.id), [
-            "antigravity.geminiPro", "antigravity.geminiWeekly", "antigravity.argonWeekly", "antigravity.trend"
+            "antigravity.geminiPro", "antigravity.geminiWeekly", "antigravity.argonWeekly",
+            "antigravity.promptCredits", "antigravity.flowCredits", "antigravity.trend"
         ])
         XCTAssertEqual(group?.expandedMetrics.map(\.id), [
             "antigravity.claude", "antigravity.claudeWeekly",
@@ -120,7 +121,7 @@ final class AntigravityLayoutTests: XCTestCase {
         XCTAssertEqual(store.pinnedMetricIDs, ["antigravity.claude"])
         XCTAssertEqual(store.expandedMetricIDs, ["antigravity.geminiPro"])
         XCTAssertEqual(store.orderedSupportedMetrics(for: "antigravity").map(\.id),
-                       savedOrder + ["antigravity.argonWeekly"])
+                       savedOrder + ["antigravity.argonWeekly", "antigravity.promptCredits", "antigravity.flowCredits"])
 
         store.setMetricEnabled("antigravity.argonWeekly", false)
         let reloaded = LayoutStore(registry: .antigravityOnly, defaults: defaults, storageKey: "layout")
@@ -128,7 +129,7 @@ final class AntigravityLayoutTests: XCTestCase {
         XCTAssertFalse(reloaded.isMetricEnabled("antigravity.geminiWeekly"))
         XCTAssertEqual(reloaded.pinnedMetricIDs, ["antigravity.claude"])
         XCTAssertEqual(reloaded.orderedSupportedMetrics(for: "antigravity").map(\.id),
-                       savedOrder + ["antigravity.argonWeekly"])
+                       savedOrder + ["antigravity.argonWeekly", "antigravity.promptCredits", "antigravity.flowCredits"])
     }
 
     func testBothResetActionsRestoreArgonEnabledAlwaysVisibleUnpinnedAfterGeminiWeekly() {

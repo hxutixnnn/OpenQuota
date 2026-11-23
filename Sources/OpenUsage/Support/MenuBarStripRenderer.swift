@@ -115,7 +115,7 @@ enum MenuBarStripRenderer {
             size: NSSize(width: CGFloat(cgImage.width) / renderer.scale, height: CGFloat(cgImage.height) / renderer.scale)
         )
         image.isTemplate = true
-        image.accessibilityDescription = "OpenUsage, usage hidden while the screen is shared"
+        image.accessibilityDescription = "OpenQuota, usage hidden while the screen is shared"
         return image
     }()
 
@@ -123,7 +123,7 @@ enum MenuBarStripRenderer {
     static let fallbackIcon: NSImage = {
         let image = NSImage(
             systemSymbolName: "gauge.with.dots.needle.bottom.50percent",
-            accessibilityDescription: "OpenUsage"
+            accessibilityDescription: "OpenQuota"
         ) ?? NSImage()
         image.isTemplate = true
         return image
@@ -138,12 +138,12 @@ private struct MenuBarPrivacyLabel: View {
         HStack(spacing: 5) {
             // The same mark and inset as `MenuBarIcon` (the art carries its own margin), sized to the
             // strip's glyph box so the swap keeps the provider-glyph scale.
-            if let mark = ProviderMarks.mark(for: "openusage") {
+            if let mark = ProviderMarks.mark(for: "openquota") {
                 ProviderIconShape(mark: mark, inset: 0.08)
                     .fill(Color.black)
                     .frame(width: 16, height: 16)
             }
-            Text("OpenUsage")
+            Text("OpenQuota")
                 .font(.system(size: 12, weight: .bold))
         }
         .foregroundStyle(.black)
@@ -208,7 +208,7 @@ private struct MenuBarTextStrip: View {
     }
 }
 
-/// Draws up to four horizontal usage bars into a compact square — a 1:1 port of the original OpenUsage
+/// Draws up to four horizontal usage bars into a compact square — a 1:1 port of the original OpenQuota
 /// tray bars: track 0.16 / fill 1.0 / remainder 0.24 opacity (black, so the template tints them), a
 /// rounded leading edge with a small rounded moving edge, and near-full quantization so a 97% bar still
 /// shows a visible tail.
@@ -275,7 +275,7 @@ private struct MenuBarBars: View {
 }
 
 /// Pure fill geometry for the Bars glyph, factored out so the near-full quantization and minimum-visible
-/// remainder rules are unit-testable. A 1:1 port of the original OpenUsage tray math.
+/// remainder rules are unit-testable. A 1:1 port of the original OpenQuota tray math.
 enum MenuBarBarGeometry {
     struct Fill: Equatable {
         let fillW: CGFloat

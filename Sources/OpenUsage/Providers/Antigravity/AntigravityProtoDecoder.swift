@@ -1,7 +1,7 @@
 import Foundation
 
 /// Decodes the generation-accounting fields in Antigravity's undocumented conversation protobufs.
-/// Based on FelixIsaac's original implementation in openusage#1058 and the follow-up in #1120.
+/// Based on FelixIsaac's original implementation in openquota#1058 and the follow-up in #1120.
 enum AntigravityProtoDecoder {
     enum WireValue {
         case varint(UInt64)

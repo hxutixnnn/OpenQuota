@@ -6,7 +6,7 @@ import Foundation
 enum AntigravityError: Error, LocalizedError, Equatable {
     /// No usable credentials anywhere (no LS running, no keychain token, nothing cached).
     case notSignedIn
-    /// The Keychain credential may exist, but macOS would not let OpenUsage read it.
+    /// The Keychain credential may exist, but macOS would not let OpenQuota read it.
     case credentialStoreUnreadable
     /// The Keychain item was present but did not contain usable Antigravity credential data.
     case invalidCredentialData

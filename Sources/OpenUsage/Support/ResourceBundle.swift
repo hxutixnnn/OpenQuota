@@ -1,7 +1,7 @@
 import Foundation
 
 extension Bundle {
-    /// The bundle carrying OpenUsage's copied resources (provider SVGs, pricing supplement + snapshots).
+    /// The bundle carrying OpenQuota's copied resources (provider SVGs, pricing supplement + snapshots).
     ///
     /// SwiftPM generates `Bundle.module` for an executable target that only looks two places: next to
     /// `Bundle.main.bundleURL` (which, for a packaged `.app`, is the app root) and a path into the build
@@ -39,7 +39,7 @@ extension Bundle {
     }()
 }
 
-/// Sentinel check: a valid OpenUsage resource bundle carries the bundled pricing supplement at its
+/// Sentinel check: a valid OpenQuota resource bundle carries the bundled pricing supplement at its
 /// root (`.copy("Resources/pricing_supplement.json")`). Uses the same lookup the pricing store relies
 /// on, so it can never reject the real shipped bundle.
 private func isValidOpenUsageResourceBundle(_ bundle: Bundle) -> Bool {

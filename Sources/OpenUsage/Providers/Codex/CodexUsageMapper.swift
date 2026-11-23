@@ -227,7 +227,7 @@ enum CodexUsageMapper {
 
     /// Codex flex credits as raw values: the floored credit count and its dollar value (count × 4¢),
     /// shown combined as e.g. "$32.84 · 821 credits". The count is floored *before* pricing to match the
-    /// Codex CLI/plugin (so OpenUsage's dollar agrees with Codex's own), which keeps the two values
+    /// Codex CLI/plugin (so OpenQuota's dollar agrees with Codex's own), which keeps the two values
     /// mutually consistent. Negative balances clamp to zero, so an exhausted balance reads
     /// "$0.00 · 0 credits" — a real, measured zero, not "No data".
     static func creditValues(remaining: Double) -> [MetricValue] {

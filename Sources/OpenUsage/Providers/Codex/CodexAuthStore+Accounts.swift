@@ -31,7 +31,7 @@ extension CodexAuthStore {
         }
     }
 
-    /// Only an independent Codex home may have its token rotated by OpenUsage. xswap's main and saved
+    /// Only an independent Codex home may have its token rotated by OpenQuota. xswap's main and saved
     /// homes, pi, and the Keychain belong to tools that manage their own credential lifecycle.
     func isWritable(_ source: CodexAuthState.Source) -> Bool {
         guard case .file(let path) = source else { return false }

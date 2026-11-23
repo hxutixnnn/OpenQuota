@@ -48,7 +48,7 @@ final class FirstLaunchSetupTests: XCTestCase {
         XCTAssertEqual(setup.selectedIDs, ["codex"], "a login only an account card sees, like a second Codex home, is on this Mac")
     }
 
-    func testCodexKeychainLoginCountsBeforeOpenUsageMayReadIt() async {
+    func testCodexKeychainLoginCountsBeforeOpenQuotaMayReadIt() async {
         let codex = CodexProvider(
             authStore: CodexAuthStore(
                 environment: FakeEnvironment(["CODEX_HOME": "/test/codex"]),

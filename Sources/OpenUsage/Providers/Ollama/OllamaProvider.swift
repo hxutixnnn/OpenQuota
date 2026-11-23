@@ -92,7 +92,7 @@ final class OllamaProvider: ProviderRuntime {
         case .success(let body):
             do {
                 let mapped = try OllamaUsageMapper.map(balanceBody: body, accountBody: accountBody)
-                // A 200 carrying a body OpenUsage can't read drops the badge exactly as silently as a
+                // A 200 carrying a body OpenQuota can't read drops the badge exactly as silently as a
                 // failed request did, so it earns the same notice. An account that simply has no plan
                 // (`.absent`) stays quiet — that is ordinary, not a fault.
                 if warning == nil, mapped.plan == .unreadable {

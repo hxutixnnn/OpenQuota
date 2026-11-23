@@ -5,8 +5,8 @@ import Security
 ///
 /// Saving new data resets which apps may read an item without asking: only the app that saved it
 /// keeps access. Claude Code, gh, Cursor's agent, and Antigravity save through `security`, so
-/// OpenUsage reads and saves those logins through it too. The user's Always Allow then survives
-/// every renewal, and OpenUsage's saves never lock those tools out of their own logins.
+/// OpenQuota reads and saves those logins through it too. The user's Always Allow then survives
+/// every renewal, and OpenQuota's saves never lock those tools out of their own logins.
 struct SecurityToolItemAccessor: SecurityItemAccessing {
     var processRunner: any ProcessRunning = SystemProcessRunner()
 

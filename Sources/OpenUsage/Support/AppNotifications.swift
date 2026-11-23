@@ -48,7 +48,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         ensureAuthorization()
     }
 
-    /// Open System Settings → Notifications so the user can re-enable alerts for OpenUsage after a
+    /// Open System Settings → Notifications so the user can re-enable alerts for OpenQuota after a
     /// macOS-level denial (the app can't re-prompt once the system has cached a decision). No-op under
     /// tests.
     func openSystemNotificationsSettings() {
@@ -86,10 +86,10 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         content.title = title
         content.subtitle = subtitle
         content.body = body
-        // Group all OpenUsage alerts into one stacked thread so simultaneous alerts (e.g. a metric
+        // Group all OpenQuota alerts into one stacked thread so simultaneous alerts (e.g. a metric
         // that fires two milestones at once) collapse into a single banner with a "N more" summary
         // instead of separate banners.
-        content.threadIdentifier = "openusage"
+        content.threadIdentifier = "openquota"
         if soundEnabled { content.sound = .default }
         let id = "openusage-\(idPrefix)-\(UUID().uuidString)"
         let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
@@ -161,7 +161,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         guard response.actionIdentifier == UNNotificationDefaultActionIdentifier,
-              response.notification.request.content.threadIdentifier == "openusage"
+              response.notification.request.content.threadIdentifier == "openquota"
         else {
             completionHandler()
             return

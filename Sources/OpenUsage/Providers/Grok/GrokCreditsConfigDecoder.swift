@@ -1,6 +1,6 @@
 import Foundation
 
-/// The slice of Grok's credits config OpenUsage renders: the shared-pool usage percent and the
+/// The slice of Grok's credits config OpenQuota renders: the shared-pool usage percent and the
 /// period it applies to. Decoded from `GET /v1/billing?format=credits` (proto-JSON).
 struct GrokCreditsConfig: Equatable, Sendable {
     /// `USAGE_PERIOD_TYPE_*` enum name; see `GrokCreditsConfigDecoder.weeklyPeriodType`.

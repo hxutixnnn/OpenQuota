@@ -76,7 +76,7 @@ enum ClaudeDesktopCredentialError: Error, Sendable {
 /// Reads Claude Desktop's Electron OAuth cache as an externally owned, read-only credential source.
 ///
 /// The refresh token is deliberately never decoded into `ClaudeOAuth`: Anthropic rotates refresh
-/// tokens, so using one here would invalidate Claude Desktop's copy. OpenUsage only borrows a currently
+/// tokens, so using one here would invalidate Claude Desktop's copy. OpenQuota only borrows a currently
 /// valid access token and waits for Desktop to renew it.
 struct ClaudeDesktopAuthStore: Sendable {
     private static let configRelativePath = "Library/Application Support/Claude/config.json"

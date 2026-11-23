@@ -162,13 +162,16 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
                 .filter { !$0.limitResources.isEmpty }
                 .map(\.metricLabel)
         )
-        XCTAssertEqual(
-            Set(AntigravityUsageMapper.summaryBuckets.map(\.label)).union([AntigravityMetric.argonWeeklyLabel]),
-            descriptorLabels
-        )
+        // The summary covers the five pool meters; Prompt/Flow credits come from the local agent's
+        // GetUserStatus, so they are declared but absent from a summary-only response.
+        let summaryLabels = Set(AntigravityUsageMapper.summaryBuckets.map(\.label))
+            .union([AntigravityMetric.argonWeeklyLabel])
+        XCTAssertTrue(summaryLabels.isSubset(of: descriptorLabels))
+        XCTAssertTrue(descriptorLabels.contains(AntigravityMetric.promptCreditsLabel))
+        XCTAssertTrue(descriptorLabels.contains(AntigravityMetric.flowCreditsLabel))
 
         let summaryLines = AntigravityUsageMapper.parseQuotaSummary(Data("{\(fullGroupsJSON)}".utf8)) ?? []
-        XCTAssertEqual(Set(summaryLines.map(\.label)), descriptorLabels)
+        XCTAssertTrue(Set(summaryLines.map(\.label)).isSubset(of: descriptorLabels))
 
         // The legacy path emits the two 5h pool labels — a strict subset of the descriptors.
         let legacyLabels = Set(AntigravityUsageMapper.buildLines([
@@ -221,9 +224,9 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
         XCTAssertEqual(snapshot.plan, "Pro")
         XCTAssertEqual(snapshot.lines.map(\.label), ["Session", "Weekly", "Argon Weekly", "Claude", "Claude Weekly"])
         XCTAssertEqual(snapshot.lines.map { used($0) }, [25, 10, 40, 60, 0])
-        assertSummaryRequests(routing, hosts: ["cloudcode-pa.googleapis.com"])
-        XCTAssertFalse(routing.requests.contains { $0.url.host == "daily-cloudcode-pa.googleapis.com" },
-                       "a complete production response must not be replaced by the partial daily response")
+        // Both hosts are asked now: the production host has looked complete while reporting 100% left,
+        // so a single body can no longer be trusted to be the whole truth.
+        assertSummaryRequests(routing, hosts: ["cloudcode-pa.googleapis.com", "daily-cloudcode-pa.googleapis.com"])
 
         // Without Antigravity's client metadata loadCodeAssist omits currentTier/paidTier.
         let planRequest = routing.requests.first { $0.url.path.contains("loadCodeAssist") }
@@ -338,8 +341,9 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
 
         let snapshot = await provider.refresh()
         XCTAssertEqual(snapshot.lines.map(\.label), ["Session", "Weekly", "Argon Weekly", "Claude", "Claude Weekly"])
-        // Claude buckets come from the production host (first wins); Gemini and Argon from the daily host.
-        XCTAssertEqual(snapshot.lines.map { used($0) }, [25, 10, 40, 0, 20])
+        // Merged by id, keeping the most-consumed reading: the production host reports Claude weekly
+        // 0.8 left and 5-hour exhausted, the daily host has Gemini and Argon.
+        XCTAssertEqual(snapshot.lines.map { used($0) }, [25, 10, 40, 60, 20])
         assertSummaryRequests(routing, hosts: ["cloudcode-pa.googleapis.com", "daily-cloudcode-pa.googleapis.com"])
     }
 
@@ -359,9 +363,9 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
 
         let start = Date()
         let snapshot = await provider.refresh()
-        XCTAssertLessThan(Date().timeIntervalSince(start), 5)
+        XCTAssertLessThan(Date().timeIntervalSince(start), 6, "the per-host deadline must cut off a stalled host")
         XCTAssertEqual(snapshot.lines.map(\.label), ["Session", "Weekly", "Argon Weekly", "Claude", "Claude Weekly"])
-        assertSummaryRequests(routing, hosts: ["cloudcode-pa.googleapis.com"])
+        assertSummaryRequests(routing, hosts: ["cloudcode-pa.googleapis.com", "daily-cloudcode-pa.googleapis.com"])
     }
 
     @MainActor

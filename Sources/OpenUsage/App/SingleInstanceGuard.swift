@@ -1,7 +1,7 @@
 import AppKit
 import Darwin
 
-/// Rejects a second copy of OpenUsage at launch (issue #635). macOS can fire two independent launch
+/// Rejects a second copy of OpenQuota at launch (issue #635). macOS can fire two independent launch
 /// triggers on reboot — session restoration ("Reopen windows when logging back in") and the
 /// `SMAppService` login item — and a crashed or hung copy can linger holding `127.0.0.1:6736`.
 /// Without a guard either path yields a duplicate menu-bar icon (or, for an `LSUIElement` app, a

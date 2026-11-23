@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-/// Renders the OpenUsage brand gauge mark into a template `NSImage` for the menu bar.
+/// Renders the OpenQuota brand gauge mark into a template `NSImage` for the menu bar.
 /// Reuses the same SVG→`ProviderIconShape` pipeline as the provider tiles, so there is no
 /// asset catalog or second SVG parser to maintain.
 @MainActor
@@ -13,7 +13,7 @@ enum MenuBarIcon {
     static let image: NSImage? = render()
 
     private static func render() -> NSImage? {
-        guard let mark = ProviderMarks.mark(for: "openusage") else { return nil }
+        guard let mark = ProviderMarks.mark(for: "openquota") else { return nil }
         let renderer = ImageRenderer(
             // Smaller inset than the provider default so the brand gauge keeps its prior menu-bar size
             // (its art already carries ~8% margin inside the source viewBox).

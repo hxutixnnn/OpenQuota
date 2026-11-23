@@ -2,13 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "OpenUsage",
+    name: "OpenQuota",
     platforms: [
         .macOS(.v15)
     ],
     products: [
-        .executable(name: "OpenUsage", targets: ["OpenUsageApp"]),
-        .executable(name: "openusage-cli", targets: ["OpenUsageCLI"])
+        .executable(name: "OpenQuota", targets: ["OpenUsageApp"]),
+        .executable(name: "openquota-cli", targets: ["OpenUsageCLI"])
     ],
     dependencies: [
         // The de-facto standard recorder + global hotkey for Mac apps (System Settings-style field).

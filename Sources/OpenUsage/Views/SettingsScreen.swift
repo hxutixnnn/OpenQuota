@@ -25,7 +25,7 @@ struct SettingsScreen: View {
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.fallback
     /// Surfaced under the Advanced rows when copying the path or revealing the file fails.
     @State private var logActionError: String?
-    /// macOS notification authorization for OpenUsage, surfaced in the Notifications section so a
+    /// macOS notification authorization for OpenQuota, surfaced in the Notifications section so a
     /// warning glyph and action button can appear when alerts can't be delivered. Refreshed on appear,
     /// when a trigger turns on, and when the app becomes active again (e.g. the user returns from
     /// System Settings after re-enabling).
@@ -113,7 +113,7 @@ struct SettingsScreen: View {
             row("Global Shortcut") {
                 ShortcutRecorderField(name: .togglePopover, isVisible: layout.screen == .settings)
                     .id(shortcutFieldGeneration)
-                    .hoverTooltip("Open OpenUsage from anywhere")
+                    .hoverTooltip("Open OpenQuota from anywhere")
             }
         }
     }
@@ -208,13 +208,13 @@ struct SettingsScreen: View {
                 Toggle("", isOn: $privacy.hideUsageWhileScreenSharing)
                     .settingsSwitchStyle()
             }
-            Text("While your screen is shared or recorded, the menu bar shows “OpenUsage” instead of your usage.")
+            Text("While your screen is shared or recorded, the menu bar shows “OpenQuota” instead of your usage.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            row("Help Make OpenUsage Better") {
+            row("Help Make OpenQuota Better") {
                 Toggle("", isOn: Binding(
                     get: { container.telemetry.isEnabled },
                     set: { container.telemetry.setEnabled($0) }
@@ -282,8 +282,8 @@ struct SettingsScreen: View {
                         .font(.caption)
                         .foregroundStyle(.orange)
                         .hoverTooltip(notificationsAuth == .denied
-                            ? "Notifications are turned off for OpenUsage. Enable them in System Settings."
-                            : "OpenUsage needs permission to send alerts.")
+                            ? "Notifications are turned off for OpenQuota. Enable them in System Settings."
+                            : "OpenQuota needs permission to send alerts.")
                 }
             }
             .padding(.horizontal, 8)
@@ -383,14 +383,14 @@ struct SettingsScreen: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            Text("Adds a global `openusage` command agents can use to monitor limits.")
+            Text("Adds a global `openquota` command agents can use to monitor limits.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 12)
                 .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             if commandLineTool.status == .conflict {
-                inlineNotice("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage.")
+                inlineNotice("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenQuota.")
             } else if let errorMessage = commandLineTool.errorMessage {
                 inlineNotice(errorMessage)
             }
@@ -400,7 +400,7 @@ struct SettingsScreen: View {
     // MARK: - Advanced (logging)
 
     /// Log-level control plus copy/reveal buttons for the file log, and the Reset All Settings row.
-    /// The file lives at a fixed path (`~/Library/Logs/OpenUsage/OpenUsage.log`); raising the level
+    /// The file lives at a fixed path (`~/Library/Logs/OpenQuota/OpenQuota.log`); raising the level
     /// here applies live (no restart) and persists across launches. Default Info, Debug is opt-in.
     private var advancedSection: some View {
         section("Advanced") {

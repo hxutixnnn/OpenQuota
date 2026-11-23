@@ -227,7 +227,7 @@ final class OllamaUsageMapperTests: XCTestCase {
     }
 
     /// Regression for #1358: the old `/api/usage` shape, or anything else without an `included`
-    /// allowance OpenUsage can read, is a loud failure rather than an empty dashboard.
+    /// allowance OpenQuota can read, is a loud failure rather than an empty dashboard.
     func testUnreadableAllowanceIsALoudFailureRatherThanAnEmptyDashboard() {
         let bodies = [
             "not json",
@@ -255,7 +255,7 @@ final class OllamaUsageMapperTests: XCTestCase {
         XCTAssertEqual(OllamaUsageMapper.plan(from: data(#"{"plan":"max"}"#)), .named("Max"))
         // An explicitly empty plan is an account without one — ordinary, and not a failure.
         XCTAssertEqual(OllamaUsageMapper.plan(from: data(#"{"Plan":""}"#)), .absent)
-        // Anything OpenUsage cannot read as an account is a failure, including a renamed or retyped
+        // Anything OpenQuota cannot read as an account is a failure, including a renamed or retyped
         // field, so the provider can say why the badge is missing instead of dropping it silently.
         XCTAssertEqual(OllamaUsageMapper.plan(from: data("not json")), .unreadable)
         XCTAssertEqual(OllamaUsageMapper.plan(from: data("[]")), .unreadable)
@@ -340,7 +340,7 @@ final class OllamaProviderRefreshTests: XCTestCase {
         XCTAssertEqual(snapshot.lines.map(\.label), ["Session", "Weekly", "Purchased Credits"])
     }
 
-    /// Regression: the failure path covered HTTP 500, but a `200 OK` carrying a body OpenUsage cannot
+    /// Regression: the failure path covered HTTP 500, but a `200 OK` carrying a body OpenQuota cannot
     /// read dropped the plan badge with no warning at all — the silent disappearance this warning exists
     /// to prevent.
     func testUnreadablePlanResponseWarnsAndKeepsTheMeters() async {

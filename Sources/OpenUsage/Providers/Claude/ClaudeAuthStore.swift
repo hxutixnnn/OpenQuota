@@ -19,9 +19,9 @@ enum ClaudeAuthError: Error, LocalizedError, Equatable {
         case .desktopPermissionRequired:
             return "Claude Desktop login found. Refresh once and choose Always Allow to connect it."
         case .swapTokenExpired:
-            return "Claude Swap login is stale. Launch this account with `cswap run`, then refresh OpenUsage."
+            return "Claude Swap login is stale. Launch this account with `cswap run`, then refresh OpenQuota."
         case .desktopTokenExpired:
-            return "Claude Desktop login is stale. Open Claude Desktop, then refresh OpenUsage."
+            return "Claude Desktop login is stale. Open Claude Desktop, then refresh OpenQuota."
         case .desktopCredentialsUnavailable:
             return "Claude Desktop login couldn't be read. Open Claude Desktop, then try again."
         case .sessionExpired:
@@ -179,7 +179,7 @@ struct ClaudeAuthStore: Sendable {
         }
         // An explicit `CLAUDE_CODE_OAUTH_TOKEN` is inference-only (typically a `claude setup-token`
         // token): it can run the model but 403s on the usage endpoint. It also reaches us when the user
-        // only *ambiently* has it exported — OpenUsage captures the login-shell environment — so it must
+        // only *ambiently* has it exported — OpenQuota captures the login-shell environment — so it must
         // not shadow a real interactive login that CAN read usage. Prefer any stored login able to fetch
         // live usage (keychain-first, then file) for the usage call, with the env token kept as a
         // trailing inference-only fallback for the refresh loop. With no live-capable stored login (a

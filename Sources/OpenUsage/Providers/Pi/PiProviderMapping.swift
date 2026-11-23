@@ -1,19 +1,19 @@
 import Foundation
 
-/// Maps a pi session log's `provider` field to the OpenUsage provider whose card its usage belongs on.
+/// Maps a pi session log's `provider` field to the OpenQuota provider whose card its usage belongs on.
 /// Pi is a BYO-key agent that drives other providers' models, so its usage is attributed back to the
 /// underlying provider (a Claude sub used inside pi lands on the Claude card) rather than shown on a
 /// card of its own.
 ///
-/// Only providers OpenUsage already has a card for are listed. Pi providers with no OpenUsage
+/// Only providers OpenQuota already has a card for are listed. Pi providers with no OpenQuota
 /// equivalent are intentionally absent and left for future work:
-/// - `nvidia-nim` — no OpenUsage card.
+/// - `nvidia-nim` — no OpenQuota card.
 ///
 /// Mapped here but not yet consumed (only Claude and Codex read the pi slice today; the rest have no
 /// local usage-trend card to fold into, or use a different spend path): `cursor` (Cursor's trend is
 /// built from its CSV export), `zai`/`zhipu`, `google-antigravity`, `github-copilot`.
 enum PiProviderMapping {
-    /// pi `provider` value → OpenUsage `Provider.id`.
+    /// pi `provider` value → OpenQuota `Provider.id`.
     static let providerToCard: [String: String] = [
         "anthropic": "claude",
         "claude-agent-sdk": "claude",
@@ -25,7 +25,7 @@ enum PiProviderMapping {
         "github-copilot": "copilot"
     ]
 
-    /// The OpenUsage card id for a pi provider, or nil when pi used a provider OpenUsage doesn't track.
+    /// The OpenQuota card id for a pi provider, or nil when pi used a provider OpenQuota doesn't track.
     static func cardID(forPiProvider provider: String) -> String? {
         providerToCard[provider]
     }

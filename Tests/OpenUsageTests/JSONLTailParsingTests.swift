@@ -259,7 +259,7 @@ final class JSONLTailParsingTests: XCTestCase {
 
     private func makeDirectory() throws -> URL {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("OpenUsageJSONLTail-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("OpenQuotaJSONLTail-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
     }

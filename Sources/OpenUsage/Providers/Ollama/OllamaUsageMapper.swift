@@ -1,7 +1,7 @@
 import Foundation
 
 /// What an account response said about the plan. Distinct from a plain `String?` because "no badge" has
-/// two very different causes: an account that has no plan (ordinary) and a response OpenUsage could not
+/// two very different causes: an account that has no plan (ordinary) and a response OpenQuota could not
 /// read (worth a warning, since the badge otherwise just disappears).
 enum OllamaPlan: Equatable, Sendable {
     /// A usable plan name for the header badge.
@@ -50,7 +50,7 @@ enum OllamaUsageMapper {
     /// Session and Weekly (legacy plans) or Monthly (current plans), then Purchased Credits.
     static func balanceLines(_ body: Data) throws -> [MetricLine] {
         // `included` is the plan allowance this provider exists to show. Missing, or matching neither
-        // documented shape, means the response isn't one OpenUsage understands: a loud failure rather
+        // documented shape, means the response isn't one OpenQuota understands: a loud failure rather
         // than an empty dashboard.
         guard let root = ProviderParse.jsonObject(body),
               let included = root["included"] as? [String: Any] else {
@@ -80,7 +80,7 @@ enum OllamaUsageMapper {
     /// same response, so both spellings are accepted.
     ///
     /// The three outcomes are kept apart on purpose. A body that isn't an account, or one whose plan
-    /// field has vanished or changed type, means OpenUsage can no longer read something it expects —
+    /// field has vanished or changed type, means OpenQuota can no longer read something it expects —
     /// worth telling the user about. A plan field that is explicitly empty is just an account with no
     /// plan, which is ordinary and must stay quiet.
     static func plan(from body: Data) -> OllamaPlan {

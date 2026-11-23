@@ -1,7 +1,7 @@
 import Foundation
 
 /// Reads token accounting from Antigravity's local conversation databases, discovered by FelixIsaac
-/// in openusage#1058/#1120. Transcript JSONL files contain no usable generation token counts.
+/// in openquota#1058/#1120. Transcript JSONL files contain no usable generation token counts.
 ///
 /// SQLite batches are bounded, and oversized protobufs are skipped before `hex(data)` runs: real
 /// Antigravity sessions can contain generation blobs hundreds of megabytes in size.

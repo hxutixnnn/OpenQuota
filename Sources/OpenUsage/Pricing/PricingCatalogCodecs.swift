@@ -1,6 +1,6 @@
 import Foundation
 
-/// Parsers for the two public pricing feeds, plus the compact catalog format OpenUsage uses for
+/// Parsers for the two public pricing feeds, plus the compact catalog format OpenQuota uses for
 /// its bundled snapshots and on-disk caches (cost fields only — the full feeds are megabytes).
 enum PricingCatalogCodecs {
     // MARK: - LiteLLM (model_prices_and_context_window.json)

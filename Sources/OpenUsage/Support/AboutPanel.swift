@@ -1,8 +1,8 @@
 import AppKit
 
-/// Presents the standard macOS About panel for the footer menu's "About OpenUsage" item.
+/// Presents the standard macOS About panel for the footer menu's "About OpenQuota" item.
 ///
-/// As a menu-bar accessory app, OpenUsage is not the active app while the popover is showing, so the
+/// As a menu-bar accessory app, OpenQuota is not the active app while the popover is showing, so the
 /// app is activated first — otherwise the panel would open behind whatever app currently owns the
 /// foreground. The panel pulls the app icon, name, and version (`CFBundleShortVersionString` — the
 /// same string `AppInfo.version` surfaces in the footer) straight from the bundle; we only supply the

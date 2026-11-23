@@ -1,19 +1,19 @@
 # Adding a Provider
 
-How to add a new AI provider to OpenUsage. Read the [architecture overview](architecture.md) first so the
+How to add a new AI provider to OpenQuota. Read the [architecture overview](architecture.md) first so the
 pieces below make sense.
 
 ## What a provider is
 
-A provider is a small Swift module under `Sources/OpenUsage/Providers/<Name>/` that conforms to
+A provider is a small Swift module under `Sources/OpenQuota/Providers/<Name>/` that conforms to
 `ProviderRuntime`. It has three parts:
 
 - an **auth store** that reads credentials already on the user's machine (config files, keychain),
 - a **usage client** that calls the provider's API,
 - a **mapper** that turns the response into the app's metric vocabulary.
 
-OpenUsage never asks the user to paste a token — if the provider's own CLI or app has already logged in,
-OpenUsage reads those existing credentials.
+OpenQuota never asks the user to paste a token — if the provider's own CLI or app has already logged in,
+OpenQuota reads those existing credentials.
 
 Besides `refresh()`, every provider implements `hasLocalCredentials()` — a cheap, local-only check
 (files, keychain; never the network) for whether those credentials exist at all. The welcome screen on a
@@ -53,7 +53,7 @@ factory only when there is no typed error, and never return stale or empty data 
 
 1. **Check first.** Look at open issues and `docs/providers/` to see if the provider is already requested
    or in progress.
-2. **Create the module.** Add `Sources/OpenUsage/Providers/<Name>/` with the auth store, usage client, and
+2. **Create the module.** Add `Sources/OpenQuota/Providers/<Name>/` with the auth store, usage client, and
    mapper, conforming to `ProviderRuntime` — both `refresh()` and `hasLocalCredentials()` (the compiler
    enforces the latter; there is no default). The probe must stay local-only and reuse the same auth-store
    loaders and credential-usability filters that `refresh()` starts with — don't write a second

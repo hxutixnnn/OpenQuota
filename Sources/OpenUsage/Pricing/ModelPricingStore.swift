@@ -2,7 +2,7 @@ import Foundation
 
 /// Owns the app's model pricing data: bundled snapshots for offline first launch, on-disk caches in
 /// Application Support, and hourly refreshes from the live feeds (LiteLLM, models.dev, and the
-/// OpenUsage pricing supplement on gh-pages). `current()` never blocks on the network — it serves
+/// OpenQuota pricing supplement on gh-pages). `current()` never blocks on the network — it serves
 /// the freshest data on hand and revalidates in the background (stale-while-revalidate).
 actor ModelPricingStore {
     static let shared = ModelPricingStore()
@@ -57,7 +57,7 @@ actor ModelPricingStore {
 
     private static var defaultCacheDirectory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("OpenUsage/pricing", isDirectory: true)
+            .appendingPathComponent("OpenQuota/pricing", isDirectory: true)
     }
 
     private static func bundledResourceData(_ resourceName: String) -> Data? {

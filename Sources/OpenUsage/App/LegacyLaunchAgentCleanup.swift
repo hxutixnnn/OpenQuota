@@ -2,7 +2,7 @@ import Foundation
 
 /// Deletes the autostart LaunchAgent left behind by the legacy Tauri edition (issues #607/#874).
 ///
-/// `tauri-plugin-autostart` (edition ≤ 0.6.28) wrote `~/Library/LaunchAgents/OpenUsage.plist` with
+/// `tauri-plugin-autostart` (edition ≤ 0.6.28) wrote `~/Library/LaunchAgents/OpenQuota.plist` with
 /// `RunAtLoad = true`, pointing at the app binary by absolute path. Updating in place never removed
 /// it, and on a case-insensitive volume (the APFS default) its Tauri-era program path
 /// (`…/Contents/MacOS/openusage`, lowercase binary name) resolves to this edition's binary. Two
@@ -37,7 +37,7 @@ enum LegacyLaunchAgentCleanup {
     /// `tauri-plugin-autostart` named the plist after the app's product name.
     static var defaultAgentURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/LaunchAgents/OpenUsage.plist")
+            .appendingPathComponent("Library/LaunchAgents/OpenQuota.plist")
     }
 
     /// Live entry point, called once per launch. Parameters exist for tests only.

@@ -87,7 +87,7 @@ final class CodexProvider: ProviderRuntime {
         }
         let keychain = await loadOffMainActor { [authStore] in authStore.loadKeychainAuth() }
         if let keychain { return keychain.hasUsableAccessToken }
-        // A Keychain login macOS hasn't let OpenUsage read yet is still a login on this Mac. An account
+        // A Keychain login macOS hasn't let OpenQuota read yet is still a login on this Mac. An account
         // card can't tell whose login it is without reading it.
         guard authStore.expectedIdentity == nil else { return false }
         return await loadOffMainActor { [authStore] in

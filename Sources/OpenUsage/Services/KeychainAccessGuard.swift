@@ -12,7 +12,7 @@ enum KeychainAccessGuard {
     private static let locks = Mutex<[String: NSLock]>([:])
     private static let deniedServices = Mutex<Set<String>>([])
     /// While the welcome screen waits for the user to pick providers, reads that would show
-    /// OpenUsage's own popup fail as not allowed. Logins read through `/usr/bin/security` were
+    /// OpenQuota's own popup fail as not allowed. Logins read through `/usr/bin/security` were
     /// saved with it, so reading them doesn't ask.
     private static let popupsHeld = Mutex(false)
     /// A read can outlive the refresh that gave up on it while its popup waits for the user.

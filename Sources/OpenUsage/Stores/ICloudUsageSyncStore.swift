@@ -24,7 +24,7 @@ struct KeychainICloudDeviceIDStore: ICloudDeviceIDStoring {
 
     init(
         keychain: any KeychainAccessing = SecurityKeychainAccessor(),
-        bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.robinebers.openusage"
+        bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "com.hxutixnnn.openquota"
     ) {
         self.keychain = keychain
         self.service = bundleIdentifier + Self.serviceSuffix
@@ -47,7 +47,7 @@ enum ICloudUsageSyncError: Error, LocalizedError {
     }
 }
 
-/// Coordinated access to the app-private data area of OpenUsage's iCloud Documents container.
+/// Coordinated access to the app-private data area of OpenQuota's iCloud Documents container.
 actor ICloudUsageHistoryFileStore: UsageHistoryFileStoring {
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -117,7 +117,7 @@ actor ICloudUsageHistoryFileStore: UsageHistoryFileStoring {
             throw ICloudUsageSyncError.unavailable
         }
         let directory = container
-            .appendingPathComponent("OpenUsage", isDirectory: true)
+            .appendingPathComponent("OpenQuota", isDirectory: true)
             .appendingPathComponent("History", isDirectory: true)
             .appendingPathComponent("v1", isDirectory: true)
         if create {
@@ -316,7 +316,7 @@ final class ICloudUsageSyncStore {
         } catch {
             let id = saved ?? UUID().uuidString.lowercased()
             defaults.set(id, forKey: deviceIDKey)
-            let message = "OpenUsage couldn’t save this Mac’s sync identity in Keychain. "
+            let message = "OpenQuota couldn’t save this Mac’s sync identity in Keychain. "
                 + "Sync may create a duplicate device if app preferences are reset."
             AppLog.warn(.keychain, "iCloud device identity failed: \(error.localizedDescription)")
             return (id, message)

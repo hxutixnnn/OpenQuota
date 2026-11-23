@@ -6,7 +6,7 @@ struct CodexAccountCard: Equatable, Sendable {
     let displayName: String
     let authHomes: [String]
     /// Canonical paths of the account's own Codex homes — never one xswap manages — whose tokens
-    /// OpenUsage may refresh and write back.
+    /// OpenQuota may refresh and write back.
     let writableAuthHomes: [String]
     let piCredentialSources: [CodexPiCredentialSource]
     /// pi's usage logs name no account, so they count for the account in pi's `openai-codex` login.

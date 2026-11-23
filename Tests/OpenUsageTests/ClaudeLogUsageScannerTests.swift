@@ -726,7 +726,7 @@ final class ClaudeLogUsageScannerTests: XCTestCase {
         let teamTokens = await tokens(team)
         XCTAssertEqual(teamTokens, 3000)
 
-        // Switching Claude Code's login while OpenUsage runs moves the claim on the next scan.
+        // Switching Claude Code's login while OpenQuota runs moves the claim on the next scan.
         try signIn(organization: "org-team")
         let switchedPersonalTokens = await tokens(personal)
         XCTAssertNil(switchedPersonalTokens)

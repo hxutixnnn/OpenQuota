@@ -1,7 +1,7 @@
 # OpenQuota
 
 Track your AI coding subscriptions from the macOS menu bar — a personal fork of
-[OpenUsage](https://github.com/robinebers/openusage), pinned to **v0.7.16**.
+[OpenQuota](https://github.com/robinebers/openusage), pinned to **v0.7.16**.
 
 OpenQuota shows how much of each AI plan you've used — session and weekly limits,
 credits, spend — in one popover, and pins the numbers you care about into the menu
@@ -33,7 +33,7 @@ git clone https://github.com/hxutixnnn/OpenQuota.git
 cd OpenQuota
 
 # build and stage a signed-for-local-use app in dist/ (about 2 minutes)
-BUNDLE_ID=com.robinebers.openusage ./script/build_and_run.sh build
+BUNDLE_ID=com.hxutixnnn.openquota ./script/build_and_run.sh build
 
 # install it (the build stages OpenQuota.app)
 cp -R dist/OpenQuota.app /Applications/
@@ -41,16 +41,16 @@ cp -R dist/OpenQuota.app /Applications/
 
 The build is ad-hoc signed, which has two consequences: iCloud sync stays off, and
 in-app updates are disabled (there is no Sparkle feed). `brew upgrade --cask
-openusage` will overwrite it with upstream.
+openquota` will overwrite it with upstream.
 
-Staging with the default `com.robinebers.openusage` bundle id keeps an existing OpenUsage
+Staging with the default `com.hxutixnnn.openquota` bundle id keeps an existing OpenQuota
 install's settings, pins and sign-ins; use `BUNDLE_ID=com.robinebers.openquota` to keep the
 fork's settings separate.
 
 ## Supported providers
 
 - **[Antigravity](docs/providers/antigravity.md)** — shared Gemini and Claude pool quotas, 5-hour and weekly windows, plus Prompt/Flow credits
-- **[Abacus.AI](Sources/OpenUsage/Providers/AbacusAI)** — monthly account credits from the `abacusai` CLI
+- **[Abacus.AI](Sources/OpenQuota/Providers/AbacusAI)** — monthly account credits from the `abacusai` CLI
 - **[Claude](docs/providers/claude.md)** — session, weekly, model-specific limits, extra usage, local daily spend
 - **[Codex](docs/providers/codex.md)** — session, weekly, credits, local daily spend
 - **[Copilot](docs/providers/copilot.md)** — AI credits, extra usage, organization billing, chat and completions
@@ -72,7 +72,7 @@ key. Credentials are used only for that provider's requests.
 - **Dashboard popover** — grouped meters with reset countdowns and pace; right-click a row to hide, star, refresh, or open Customize.
 - **Global shortcut** — toggle the popover from anywhere.
 - **Stale-while-revalidate** — cached values at launch, refresh every 5 minutes.
-- **One-shot CLI** — `openusage [provider] [--force]` prints stable JSON limits without the app running ([docs](docs/cli.md)).
+- **One-shot CLI** — `openquota [provider] [--force]` prints stable JSON limits without the app running ([docs](docs/cli.md)).
 - **Local API** — `127.0.0.1:6736/v1/limits`, loopback only ([docs](docs/local-http-api.md)).
 
 ## Development
@@ -94,5 +94,5 @@ This is an unaffiliated personal fork of
 `v0.7.16`. Upstream remains the supported app; bug reports about the patches belong
 here, everything else belongs upstream.
 
-Code is [MIT](LICENSE). The OpenUsage name and logo are upstream's and are not used
+Code is [MIT](LICENSE). The OpenQuota name and logo are upstream's and are not used
 as this fork's identity.

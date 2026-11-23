@@ -1,6 +1,6 @@
 import Foundation
 
-/// Builds a per-day token/cost series from pi's session logs for one OpenUsage card, so usage that
+/// Builds a per-day token/cost series from pi's session logs for one OpenQuota card, so usage that
 /// happened inside pi (e.g. a Claude sub driven through pi) folds into that card's Usage Trend and
 /// spend tiles alongside its native source.
 ///
@@ -90,7 +90,7 @@ actor PiUsageScanner {
 
     // MARK: - Parsing
 
-    /// Parse every mapped assistant usage line of one session file. Lines for pi providers OpenUsage
+    /// Parse every mapped assistant usage line of one session file. Lines for pi providers OpenQuota
     /// doesn't track are dropped here so they never reach aggregation.
     static func parseFile(_ data: Data) -> [Entry] {
         let marker = Data(#""usage":{"#.utf8)

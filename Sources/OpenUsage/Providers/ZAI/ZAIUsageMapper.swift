@@ -109,7 +109,7 @@ enum ZAIUsageMapper {
     /// How a percentage quota entry's window maps to a meter. Z.ai encodes the window as a
     /// `(unit, number)` pair: `unit: 3` is hours (session), `unit: 6` is weeks (weekly), `unit: 5` is
     /// months. A sub-daily window is the session meter; a multi-day window is the weekly meter.
-    /// Unknown units are ignored so a future Z.ai window cannot hide meters whose units OpenUsage
+    /// Unknown units are ignored so a future Z.ai window cannot hide meters whose units OpenQuota
     /// still understands.
     private enum TokenWindow {
         case session(periodMs: Int)
