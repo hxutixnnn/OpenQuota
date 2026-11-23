@@ -1,5 +1,11 @@
 # OpenUsage
 
+> **BetterOpenUsage** — a personal fork pinned to **v0.7.16**, carrying local patches:
+> honest Antigravity quota readings (both Cloud Code hosts merged, plus Prompt/Flow
+> credit meters), a new Abacus.AI provider that reads the `abacusai` CLI's own usage,
+> and Devin's Daily/Weekly meters pinned on first launch.
+> Upstream: [robinebers/openusage](https://github.com/robinebers/openusage).
+
 Track your AI coding subscriptions from the macOS menu bar — native Swift edition.
 
 OpenUsage shows how much of your AI coding plans you've used: session and weekly limits, credits, and spend, all in one popover. Pin your most important metrics straight into the menu bar.

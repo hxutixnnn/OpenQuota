@@ -16,10 +16,14 @@ enum AntigravityMetric {
     static let argonWeeklyID = "antigravity.argonWeekly"
     static let claudeID = "antigravity.claude"
     static let claudeWeeklyID = "antigravity.claudeWeekly"
+    static let promptCreditsID = "antigravity.promptCredits"
+    static let flowCreditsID = "antigravity.flowCredits"
 
     static let sessionLabel = "Session"
     static let weeklyLabel = "Weekly"
     static let argonWeeklyLabel = "Argon Weekly"
     static let claudeLabel = "Claude"
     static let claudeWeeklyLabel = "Claude Weekly"
+    static let promptCreditsLabel = "Prompt credits"
+    static let flowCreditsLabel = "Flow credits"
 }

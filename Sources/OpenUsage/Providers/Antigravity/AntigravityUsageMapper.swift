@@ -77,11 +77,14 @@ enum AntigravityUsageMapper {
                 AppLog.warn(LogTag.plugin("antigravity"), "quota summary: skipping unrecognized bucket id '\(bucket.bucketId ?? "<absent>")'")
                 continue
             }
-            guard pooled[id] == nil else { continue } // duplicate bucket id — first one wins
             guard let fraction = bucket.remainingFraction, fraction.isFinite else {
                 AppLog.warn(LogTag.plugin("antigravity"), "quota summary: bucket '\(id)' has no usable remainingFraction; dropping its line")
                 continue
             }
+            // Hosts disagree: the production host has reported every bucket as 100% left while the daily
+            // host carried the real usage. Within one window usage only grows, so the smaller fraction is
+            // the honest reading; keep that host's reset time with it.
+            if let existing = pooled[id], existing.fraction <= fraction { continue }
             pooled[id] = (fraction, bucket.resetTime.flatMap { OpenUsageISO8601.date(from: $0) })
         }
 
@@ -89,12 +92,19 @@ enum AntigravityUsageMapper {
             guard let entry = pooled[spec.bucketID] else { return nil }
             return line(pool: spec.label, fraction: entry.fraction, resetTime: entry.resetTime, periodMs: spec.periodMs)
         }
-        // Argon is judged per body: combining two hosts' Argon groups would read as an ambiguous bucket.
-        if let argon = groupLists.lazy.compactMap(argonWeeklyLine).first {
+        // Argon is judged per body (one unambiguous weekly bucket per body), then the most-consumed
+        // reading across hosts wins, like the shared buckets above.
+        if let argon = groupLists.compactMap(argonQuota).min(by: { $0.fraction < $1.fraction }) {
+            let line = self.line(
+                pool: AntigravityMetric.argonWeeklyLabel,
+                fraction: argon.fraction,
+                resetTime: argon.resetTime,
+                periodMs: MetricPeriod.weekMs
+            )
             let index = lines.firstIndex {
                 $0.label == AntigravityMetric.claudeLabel || $0.label == AntigravityMetric.claudeWeeklyLabel
             } ?? lines.endIndex
-            lines.insert(argon, at: index)
+            lines.insert(line, at: index)
         }
         return lines
     }
@@ -103,7 +113,7 @@ enum AntigravityUsageMapper {
     /// shared-pool groups still use only the known exact IDs above.
     private static let argonGroupName = "Gemini 4 Argon"
 
-    private static func argonWeeklyLine(_ groups: [QuotaSummaryGroup]) -> MetricLine? {
+    private static func argonQuota(_ groups: [QuotaSummaryGroup]) -> (fraction: Double, resetTime: Date?)? {
         let argonGroups = groups.filter { $0.displayName == argonGroupName }
         guard !argonGroups.isEmpty else { return nil }
         let buckets = argonGroups.flatMap { $0.buckets ?? [] }
@@ -126,12 +136,7 @@ enum AntigravityUsageMapper {
             AppLog.warn(LogTag.plugin("antigravity"), "Argon weekly quota has no usable remainingFraction; dropping its line")
             return nil
         }
-        return line(
-            pool: AntigravityMetric.argonWeeklyLabel,
-            fraction: fraction,
-            resetTime: bucket.resetTime.flatMap { OpenUsageISO8601.date(from: $0) },
-            periodMs: MetricPeriod.weekMs
-        )
+        return (fraction, bucket.resetTime.flatMap { OpenUsageISO8601.date(from: $0) })
     }
 
     /// Whether one summary body already has a usable fraction for all four shared-pool buckets, so no
@@ -166,6 +171,42 @@ enum AntigravityUsageMapper {
         let plan = formatPlan(status.userTier?.name ?? status.planStatus?.planInfo?.planName)
         let configs = (status.cascadeModelConfigData?.clientModelConfigs ?? []).compactMap(config(fromLS:))
         return (plan, configs)
+    }
+
+    /// LS `GetUserStatus` → the plan's own credit balances, as two percent meters.
+    ///
+    /// The quota-summary buckets can read 100% remaining while the plan's credits are spent, so these
+    /// are the numbers people actually watch. `available*(credits)` is what's left, capped by
+    /// `planInfo.monthly*(credits)`; both are absent on accounts without a credit plan.
+    static func parseCredits(_ data: Data) -> [MetricLine] {
+        guard let envelope = try? JSONDecoder().decode(LSUserStatusEnvelope.self, from: data),
+              let planStatus = envelope.userStatus?.planStatus
+        else {
+            return []
+        }
+        var lines: [MetricLine] = []
+        if let line = creditLine(
+            label: AntigravityMetric.promptCreditsLabel,
+            available: planStatus.availablePromptCredits?.value,
+            monthly: planStatus.planInfo?.monthlyPromptCredits?.value
+        ) {
+            lines.append(line)
+        }
+        if let line = creditLine(
+            label: AntigravityMetric.flowCreditsLabel,
+            available: planStatus.availableFlowCredits?.value,
+            monthly: planStatus.planInfo?.monthlyFlowCredits?.value
+        ) {
+            lines.append(line)
+        }
+        return lines
+    }
+
+    /// One credit balance as a percent meter. Nil when the account reports no monthly allowance.
+    static func creditLine(label: String, available: Double?, monthly: Double?) -> MetricLine? {
+        guard let monthly, monthly > 0, let available else { return nil }
+        let fraction = max(0, min(1, available / monthly))
+        return line(pool: label, fraction: fraction, resetTime: nil, periodMs: MetricPeriod.monthMs)
     }
 
     /// LS `GetCommandModelConfigs` fallback → model configs only (no plan). Nil when absent.
@@ -422,9 +463,33 @@ private struct LSUserStatusEnvelope: Decodable {
         let cascadeModelConfigData: CascadeData?
     }
     struct Tier: Decodable { let name: String? }
-    struct PlanStatus: Decodable { let planInfo: PlanInfo? }
-    struct PlanInfo: Decodable { let planName: String? }
+    struct PlanStatus: Decodable {
+        let planInfo: PlanInfo?
+        let availablePromptCredits: LenientNumber?
+        let availableFlowCredits: LenientNumber?
+    }
+    struct PlanInfo: Decodable {
+        let planName: String?
+        let monthlyPromptCredits: LenientNumber?
+        let monthlyFlowCredits: LenientNumber?
+    }
     struct CascadeData: Decodable { let clientModelConfigs: [LSModelConfig]? }
+}
+
+/// A JSON number that may also arrive as a numeric string (some plan fields do).
+private struct LenientNumber: Decodable {
+    let value: Double
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let number = try? container.decode(Double.self) {
+            value = number
+        } else if let string = try? container.decode(String.self), let number = Double(string) {
+            value = number
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "not a number")
+        }
+    }
 }
 
 private struct LSCommandConfigsEnvelope: Decodable {

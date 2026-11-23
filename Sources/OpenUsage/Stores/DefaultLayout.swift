@@ -82,6 +82,9 @@ enum DefaultLayout {
         "codex.session", "codex.weekly",
         "cursor.auto", "cursor.api",
         "copilot.premium",
+        // Devin: Daily + Weekly are the two quota meters, matching the rest of the strip. Extra Balance
+        // stays unpinned — it's a dollar balance, not a quota, and the 2-star per-provider cap is full.
+        "devin.daily", "devin.weekly",
         // Ollama: Monthly is the current plans' meter. Legacy plans' Session and Weekly stay unpinned so
         // they don't spend the two-star cap on rows a current plan never shows.
         "ollama.monthly",

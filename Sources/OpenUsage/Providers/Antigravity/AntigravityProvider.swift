@@ -54,6 +54,10 @@ final class AntigravityProvider: ProviderRuntime {
                 .exportingLimit("nonGeminiSession", unit: "percent"),
             .percent(id: AntigravityMetric.claudeWeeklyID, provider: provider, title: AntigravityMetric.claudeWeeklyLabel)
                 .exportingLimit("nonGeminiWeekly", unit: "percent"),
+            .percent(id: AntigravityMetric.promptCreditsID, provider: provider, title: AntigravityMetric.promptCreditsLabel)
+                .exportingLimit("promptCredits", unit: "percent"),
+            .percent(id: AntigravityMetric.flowCreditsID, provider: provider, title: AntigravityMetric.flowCreditsLabel)
+                .exportingLimit("flowCredits", unit: "percent"),
             .usageTrend(provider: provider)
                 .exportingHistory(
                     scope: .machineLocal,
@@ -135,6 +139,12 @@ final class AntigravityProvider: ProviderRuntime {
         ) {
             return result
         }
+        // The Antigravity agent (`antigravity acp --gemini-dir=…`) serves the same Connect-RPCs on
+        // loopback with no CSRF token; without this probe the app misses it and falls back to Cloud
+        // Code, whose quota buckets read 100% however much has been used.
+        if let result = await probeLS(processName: "antigravity", markers: [], csrfFlag: "", portFlag: nil) {
+            return result
+        }
         if let result = await probeLS(processName: "agy", markers: [], csrfFlag: "", portFlag: nil) {
             return result
         }
@@ -171,14 +181,16 @@ final class AntigravityProvider: ProviderRuntime {
             if let summary = await usageClient.callLS(scheme: endpoint.scheme, port: endpoint.port, csrf: discovered.csrf, method: "RetrieveUserQuotaSummary") {
                 if (200..<300).contains(summary.statusCode) {
                     if let lines = AntigravityUsageMapper.parseQuotaSummary(summary.body) {
-                        // The plan comes from an independent GetUserStatus call; the summary never
-                        // gates on it — a failed plan lookup just leaves the plan blank.
+                        // The plan and the credit balances come from an independent GetUserStatus
+                        // call; the summary never gates on it — a failed lookup just leaves them out.
                         var plan: String?
+                        var creditLines: [MetricLine] = []
                         if let status = await usageClient.callLS(scheme: endpoint.scheme, port: endpoint.port, csrf: discovered.csrf, method: "GetUserStatus"),
                            (200..<300).contains(status.statusCode) {
                             plan = AntigravityUsageMapper.parseUserStatus(status.body)?.plan
+                            creditLines = AntigravityUsageMapper.parseCredits(status.body)
                         }
-                        return StrategyResult(plan: plan, lines: lines)
+                        return StrategyResult(plan: plan, lines: lines + creditLines)
                     }
                     // 2xx but not a summary payload — the parser warned; fall to the legacy flow.
                 } else if summary.statusCode != 404 {
@@ -195,7 +207,8 @@ final class AntigravityProvider: ProviderRuntime {
             }
 
             if let parsed = AntigravityUsageMapper.parseUserStatus(response.body) {
-                let lines = AntigravityUsageMapper.buildLines(parsed.configs)
+                var lines = AntigravityUsageMapper.buildLines(parsed.configs)
+                lines += AntigravityUsageMapper.parseCredits(response.body)
                 if !lines.isEmpty { return StrategyResult(plan: parsed.plan, lines: lines) }
             }
 
@@ -295,9 +308,8 @@ final class AntigravityProvider: ProviderRuntime {
         switch await usageClient.cloudCodeAllHosts(
             path: AntigravityUsageClient.quotaSummaryPath,
             token: token,
-            userAgent: "antigravity",
-            body: [:],
-            isComplete: AntigravityUsageMapper.isCompleteSummary
+            userAgent: AntigravityUsageClient.clientUserAgent,
+            body: [:]
         ) {
         case .authFailed:
             return .authFailed
@@ -311,7 +323,7 @@ final class AntigravityProvider: ProviderRuntime {
         }
 
         // Legacy: fetchAvailableModels — the full Antigravity model set (Gemini + Claude + GPT-OSS).
-        switch await usageClient.cloudCode(path: AntigravityUsageClient.fetchModelsPath, token: token, userAgent: "antigravity", body: [:]) {
+        switch await usageClient.cloudCode(path: AntigravityUsageClient.fetchModelsPath, token: token, userAgent: AntigravityUsageClient.clientUserAgent, body: [:]) {
         case .authFailed:
             return .authFailed
         case .ok(let data):

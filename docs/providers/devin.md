@@ -10,6 +10,8 @@ Tracks your Devin quota using the login from the Devin CLI or the Devin app.
 | Daily | Daily quota used (hidden when Devin hides the daily quota) |
 | Extra Balance | Overage/extra-usage balance in dollars |
 
+Daily and Weekly start pinned to the menu bar on a fresh install. Extra Balance is available in the popover but not pinned by default.
+
 If Devin supplies a weekly reset but omits the weekly percentage, the weekly quota is exhausted (100% used).
 
 When Devin reports your plan name, OpenUsage shows it beside the provider name.

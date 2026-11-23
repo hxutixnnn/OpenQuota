@@ -98,7 +98,7 @@ struct AntigravityUsageClient: Sendable {
         #else
         let arch = "amd64"
         #endif
-        return "antigravity/2.24.0 (aidev_client; os_type=darwin; arch=\(arch))"
+        return "antigravity/hub/2.24.0 (aidev_client; os_type=darwin; arch=\(arch))"
     }()
 
     /// `ClientMetadata` enum names as they appear in the Antigravity language server's protos.
@@ -117,27 +117,27 @@ struct AntigravityUsageClient: Sendable {
         return .unavailable
     }
 
-    /// POST a Cloud Code endpoint on each base URL in order and return every 2xx body in base-URL order.
-    /// The hosts can disagree: `daily-cloudcode-pa` has answered the quota summary with only the Claude
-    /// group while `cloudcode-pa` also returned Gemini, so a caller merging by id may need both. Stops
-    /// after the first base when its 2xx body is one `isComplete` accepts: callers merge first-wins, so
-    /// a later answer couldn't change the result. Any 2xx wins; otherwise a 401/403 on any base is
-    /// `.authFailed`, and anything else `.unavailable`.
+    /// POST a Cloud Code endpoint on each base URL and return every 2xx body in base-URL order.
+    /// The hosts disagree in both directions: `daily-cloudcode-pa` has answered the quota summary with
+    /// only the Claude group, and `cloudcode-pa` has answered with every bucket at 100% left while the
+    /// daily host carried the real usage. So every host is asked and the caller merges by id, taking the
+    /// most-consumed reading. Any 2xx wins; otherwise a 401/403 on any base is `.authFailed`, and
+    /// anything else `.unavailable`.
     func cloudCodeAllHosts(
         path: String,
         token: String,
         userAgent: String,
-        body: [String: String],
-        isComplete: (Data) -> Bool = { _ in false }
+        body: [String: String]
     ) async -> CloudCodeAllHostsOutcome {
         let payload = (try? JSONSerialization.data(withJSONObject: body)) ?? Data("{}".utf8)
         var responses: [HTTPResponse] = []
-        for (index, base) in Self.cloudCodeURLs.enumerated() {
+        for base in Self.cloudCodeURLs {
             guard let url = URL(string: base + path) else { continue }
             let request = Self.cloudCodeRequest(url: url, token: token, userAgent: userAgent, payload: payload)
             guard let response = try? await http.send(request) else { continue }
             responses.append(response)
-            if index == 0, (200..<300).contains(response.statusCode), isComplete(response.body) { break }
+            // Every host is asked: one can answer a complete-looking summary that reports 100% left for
+            // buckets the other host has real usage for, so no single body can end the loop.
         }
         let bodies = responses.filter { (200..<300).contains($0.statusCode) }.map(\.body)
         if !bodies.isEmpty { return .ok(bodies) }
