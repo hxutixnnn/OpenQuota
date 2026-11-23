@@ -35,16 +35,17 @@ cd OpenQuota
 # build and stage a signed-for-local-use app in dist/ (about 2 minutes)
 BUNDLE_ID=com.robinebers.openusage ./script/build_and_run.sh build
 
-# install it
-cp -R dist/OpenUsage.app /Applications/
+# install it (the build stages OpenQuota.app)
+cp -R dist/OpenQuota.app /Applications/
 ```
 
 The build is ad-hoc signed, which has two consequences: iCloud sync stays off, and
 in-app updates are disabled (there is no Sparkle feed). `brew upgrade --cask
 openusage` will overwrite it with upstream.
 
-To keep the fork's settings separate from an upstream install, stage with its own
-bundle id instead: `BUNDLE_ID=com.robinebers.openquota ./script/build_and_run.sh build`.
+Staging with the default `com.robinebers.openusage` bundle id keeps an existing OpenUsage
+install's settings, pins and sign-ins; use `BUNDLE_ID=com.robinebers.openquota` to keep the
+fork's settings separate.
 
 ## Supported providers
 
