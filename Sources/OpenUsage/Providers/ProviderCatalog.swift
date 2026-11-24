@@ -72,6 +72,7 @@ enum ProviderCatalog {
             CopilotProvider(defaults: defaults),
             DevinProvider(),
             GrokProvider(),
+            MistralProvider(),
             OllamaProvider(),
             OpenCodeProvider(),
             OpenRouterProvider(),
