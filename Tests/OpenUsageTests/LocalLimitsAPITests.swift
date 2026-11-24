@@ -250,6 +250,9 @@ final class LocalLimitsAPITests: XCTestCase {
             "ollama": ["session", "weekly", "monthly", "purchasedCredits"],
             "opencode": ["session", "weekly", "monthly"],
             "openrouter": ["credits", "balance", "keyLimit"],
+            // Mistral's two monthly allowance meters are percent-only and declare no public scalar
+            // resource yet, so the local API lists the provider with an empty resource set.
+            "mistral": [],
             "zai": ["session", "weekly", "webSearches"]
         ]
 
