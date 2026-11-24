@@ -195,7 +195,7 @@ final class WidgetDataStoreTests: XCTestCase {
 
     func testDonutFractionMatchesRoundedHeadline() {
         for (used, headline, fraction) in [
-            (0.3915, "0%", 0.0), (0.6, "1%", 0.01), (99.6, "100%", 1.0)
+            (0.3915, "0.39%", 0.0039), (0.6, "0.60%", 0.006), (99.6, "100%", 1.0)
         ] {
             let data = WidgetData(
                 title: "Total usage", icon: .providerMark("cursor"), kind: .percent,

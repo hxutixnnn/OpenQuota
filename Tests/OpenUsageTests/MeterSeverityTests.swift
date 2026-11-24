@@ -48,10 +48,19 @@ final class MeterSeverityTests: XCTestCase {
     }
 
     func testRemainderRoundingToZeroIsSpentOverACalmerPace() {
-        // 99.6% used with 99.7% of the window gone projects to ~99.9% → "Close to limit"/amber by
-        // pace. But the 0.4% remaining rounds to "0% left", so the balance reads empty — spent
-        // outranks the pace verdict, so the bar is red, not amber.
-        XCTAssertEqual(pacedData(used: 99.6, elapsed: 0.997).meterState(now: now), .spent)
+        // 99.999% used with 99.7% of the window gone projects to over the limit → pace says "run out
+        // soon". But the 0.001% remaining still rounds to "0.00% left" — a balance the user cannot see
+        // is empty, so spent outranks the pace verdict and the bar is red with "Limit reached".
+        XCTAssertEqual(pacedData(used: 99.999, elapsed: 0.997).meterState(now: now), .spent)
+    }
+
+    func testAVisibleRemainderIsNotSpent() {
+        // Percent keeps two decimals under 1%, so 0.4% left prints "0.40% left" — a remainder the user
+        // can see. The meter keeps the pace verdict (still red, run-out) instead of claiming "Limit
+        // reached" beside a non-zero remainder.
+        guard case .runningOut = pacedData(used: 99.6, elapsed: 0.997).meterState(now: now) else {
+            return XCTFail("expected runningOut for a visible remainder")
+        }
     }
 
     func testRemainderRoundingToZeroIsSpentWithoutAResetWindow() {

@@ -215,12 +215,13 @@ struct WidgetData: Hashable {
         roundedAtDisplayPrecision(displayedValue)
     }
 
-    /// Rounds a value to the precision this kind shows in the headline — whole percent, one-decimal
-    /// count, or cents — so the meter geometry and the spent check never disagree with the printed
-    /// number. (A value that reads "0%" must register as zero, not a hairline sliver.)
+    /// Rounds a value to the precision this kind shows in the headline — percent (see
+    /// `MetricFormatter.percentPrecision`), one-decimal count, or cents — so the meter geometry and the
+    /// spent check never disagree with the printed number. (A value that reads "0%" must register as
+    /// zero, not a hairline sliver.)
     private func roundedAtDisplayPrecision(_ value: Double) -> Double {
         switch kind {
-        case .percent: return value.rounded()
+        case .percent: return MetricFormatter.percentPrecision(value).value
         case .count: return (value * 10).rounded() / 10
         case .dollars: return (value * 100).rounded() / 100
         }

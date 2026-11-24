@@ -26,9 +26,16 @@ final class MetricFormatterTests: XCTestCase {
         XCTAssertEqual(MetricFormatter.number(820.6, kind: .count, style: .row), "820.6")
     }
 
-    func testPercentRoundsToWholeInEveryStyle() {
+    func testPercentKeepsAPrecisionForSmallReadings() {
+        // Whole percent at or above 10%, one decimal under 10, two under 1 — a small monthly allowance
+        // (Mistral reports 0.05% of a €25.50 API cap) must not read "0%" for weeks and look frozen.
         XCTAssertEqual(MetricFormatter.number(95, kind: .percent, style: .full), "95%")
         XCTAssertEqual(MetricFormatter.number(95.4, kind: .percent, style: .tray), "95%")
+        XCTAssertEqual(MetricFormatter.number(9.96, kind: .percent, style: .row), "10%")
+        XCTAssertEqual(MetricFormatter.number(4.8, kind: .percent, style: .row), "4.8%")
+        XCTAssertEqual(MetricFormatter.number(0.4, kind: .percent, style: .row), "0.40%")
+        XCTAssertEqual(MetricFormatter.number(0.0481, kind: .percent, style: .row), "0.05%")
+        XCTAssertEqual(MetricFormatter.number(0, kind: .percent, style: .row), "0%")
     }
 
     func testPercentClampsOutOfRangeSamples() {

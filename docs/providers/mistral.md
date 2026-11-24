@@ -13,8 +13,11 @@ CLI that stashes a login, so there is nothing local to read on its own.
 
 Both allowances reset on the first day of each calendar month; the meters show the reset date. Mistral
 bills in EUR and reports each allowance as a percentage of its monthly cap, so the meters show that
-percentage rather than a dollar figure — OpenQuota's currency format is USD-only. When Mistral reports
-your plan name, OpenQuota shows it beside the provider name.
+percentage rather than a dollar figure — OpenQuota's currency format is USD-only. Because the cap is
+large (€25.50 of API and €255 of Vibe & Studio on the Individual plan), a normal day's usage is a
+fraction of a percent: the meters keep one decimal below 10% and two below 1%, so the reading still
+moves instead of sitting on 0%. When Mistral reports your plan name, OpenQuota shows it beside the
+provider name.
 
 ## Where credentials come from
 
