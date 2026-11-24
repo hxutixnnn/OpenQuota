@@ -82,6 +82,11 @@ enum MetricFormatter {
             digits = 0
             rounded = roundedToDigits(clamped, 0)
         }
+        // A reading that rounds away at its own precision prints the plain zero, and the meter stays
+        // empty: "0%", never "0.00%" beside a hairline sliver of fill.
+        if rounded == 0 {
+            digits = 0
+        }
         return (digits, rounded)
     }
 

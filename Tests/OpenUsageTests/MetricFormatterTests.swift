@@ -36,6 +36,8 @@ final class MetricFormatterTests: XCTestCase {
         XCTAssertEqual(MetricFormatter.number(0.4, kind: .percent, style: .row), "0.40%")
         XCTAssertEqual(MetricFormatter.number(0.0481, kind: .percent, style: .row), "0.05%")
         XCTAssertEqual(MetricFormatter.number(0, kind: .percent, style: .row), "0%")
+        // A reading that rounds away at its own precision prints the plain zero, never "0.00%".
+        XCTAssertEqual(MetricFormatter.number(0.004, kind: .percent, style: .row), "0%")
     }
 
     func testPercentClampsOutOfRangeSamples() {

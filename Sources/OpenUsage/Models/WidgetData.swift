@@ -250,10 +250,10 @@ struct WidgetData: Hashable {
         guard hasData else { return valueText }
         if let limit, limit > 0 {
             if kind == .percent {
-                // Percent is the only bounded unit that should collapse to a tray percentage. Clamp both
-                // ends so a provider sample can never print "-5%" or "105%" beside the icon.
-                let percent = min(100, max(0, Int((displayedValue / limit * 100).rounded())))
-                return "\(percent)%"
+                // Percent is the only bounded unit that should collapse to a tray percentage. It goes
+                // through the shared formatter so the tray keeps the popover's precision (0.05%, not
+                // "0%") and the same 0...100 clamp, instead of rounding on its own.
+                return MetricFormatter.number(displayedValue / limit * 100, kind: .percent, style: .tray)
             }
             return MetricFormatter.number(displayedValue, kind: kind, style: .tray)
         }
