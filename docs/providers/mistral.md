@@ -19,6 +19,12 @@ fraction of a percent: the meters keep one decimal below 10% and two below 1%, s
 moves instead of sitting on 0%. When Mistral reports your plan name, OpenQuota shows it beside the
 provider name.
 
+Because the monthly window is known, both allowances also pace: the row projects where this month's
+spend lands at reset, turns amber or red with a run-out time when the burn rate would exhaust the
+allowance before it refills, and gains the steady-use tick with **Always Show Pacing** on. Rows below
+5% used keep the plain blue reading rather than project a whole month from a fraction of a percent.
+Pacing stops while `reset_at` is missing, since there is no window to project across.
+
 ## Where credentials come from
 
 Add your Mistral API key in **Customize → Mistral → API Key**, set `MISTRAL_API_KEY`, or write
@@ -33,7 +39,8 @@ key without it returns 403 and the card reports the key as invalid.
 Two calls under `https://api.mistral.ai/v1` with `Authorization: Bearer <key>`:
 
 - `GET /billing/budget` → `api_budget` and `vibe_budget`, each `usage_percentage`, `initial_budget`
-  (EUR), `reset_at`, `payg_enabled`
+  (EUR), `reset_at`, `payg_enabled`. `reset_at` drives both the countdown and the pacing window, which
+  starts one calendar month earlier.
 - `GET /billing/subscription` → `plan_name` and per-service pay-as-you-go flags
 
 The meters come entirely from `/billing/budget`; the subscription call only supplies the plan badge,

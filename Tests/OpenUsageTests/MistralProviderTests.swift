@@ -97,16 +97,44 @@ final class MistralUsageMapperTests: XCTestCase {
         XCTAssertTrue(MistralUsageMapper.budgetLines(from: ["foo": "bar"]).isEmpty)
     }
 
+    /// The pacing window is the real billing month that ends at `reset_at`, not a 30-day stand-in:
+    /// November and July run 30 and 31 days, February 2027 runs 28.
+    func testAllowanceWindowsAreCalendarMonths() throws {
+        let cases: [(reset: String, days: Int)] = [
+            ("2026-12-01T00:00:00Z", 30),
+            ("2026-08-01T00:00:00Z", 31),
+            ("2027-03-01T00:00:00Z", 28)
+        ]
+
+        for testCase in cases {
+            let lines = MistralUsageMapper.budgetLines(from: [
+                "api_budget": ["usage_percentage": 1, "initial_budget": 25.5, "reset_at": testCase.reset]
+            ])
+            let api = try XCTUnwrap(progress(lines, "API Allowance"))
+            XCTAssertEqual(api.period, testCase.days * MetricPeriod.dayMs, testCase.reset)
+        }
+    }
+
+    func testAllowanceWithoutResetDateCarriesNoWindow() {
+        let lines = MistralUsageMapper.budgetLines(from: [
+            "api_budget": ["usage_percentage": 10, "initial_budget": 25.5]
+        ])
+        XCTAssertNil(progress(lines, "API Allowance")?.period)
+    }
+
     func testPlanNameTitleCased() {
         XCTAssertEqual(MistralUsageMapper.planName(from: ["plan_name": "INDIVIDUAL"]), "Individual")
         XCTAssertNil(MistralUsageMapper.planName(from: [:]))
     }
 
-    private func progress(_ lines: [MetricLine], _ label: String) -> (used: Double, limit: Double, resetsAt: Date?)? {
-        guard case .progress(_, let used, let limit, _, let resetsAt, _, _) = lines.first(where: { $0.label == label }) else {
+    private func progress(
+        _ lines: [MetricLine],
+        _ label: String
+    ) -> (used: Double, limit: Double, resetsAt: Date?, period: Int?)? {
+        guard case .progress(_, let used, let limit, _, let resetsAt, let period, _) = lines.first(where: { $0.label == label }) else {
             return nil
         }
-        return (used, limit, resetsAt)
+        return (used, limit, resetsAt, period)
     }
 
     private func badgeText(_ lines: [MetricLine], _ label: String) -> String? {
@@ -114,6 +142,56 @@ final class MistralUsageMapperTests: XCTestCase {
             return nil
         }
         return text
+    }
+}
+
+/// Locks the user-visible half of the monthly window: a Mistral allowance row can now project where
+/// its spend lands at reset, where a reset date with no period could only report its level band.
+@MainActor
+final class MistralPaceTests: XCTestCase {
+    func testAllowanceRowPacesAcrossItsMonthlyWindow() async throws {
+        let reset = "2026-12-15T12:00:00Z"
+        let resetsAt = try XCTUnwrap(OpenUsageISO8601.date(from: reset))
+        let lines = MistralUsageMapper.budgetLines(from: [
+            "api_budget": ["usage_percentage": 42.0, "initial_budget": 25.5, "reset_at": reset]
+        ])
+        let (store, descriptor) = await makeStore(lines: lines)
+
+        // Halfway through the window at 42% used → ~84% at reset → ~16% left to spare.
+        let halfway = resetsAt.addingTimeInterval(-15 * 24 * 60 * 60)
+        XCTAssertEqual(store.data(for: descriptor).meterState(now: halfway).tooltip, "~16% left at reset")
+    }
+
+    /// Runs the mapper's lines through the real resolve path every provider funnels through.
+    private func makeStore(lines: [MetricLine]) async -> (WidgetDataStore, WidgetDescriptor) {
+        let provider = Provider(id: "mistral", displayName: "Mistral", icon: .providerMark("mistral"))
+        let descriptor = WidgetDescriptor(
+            id: "mistral.api",
+            providerID: provider.id,
+            metricLabel: "API Allowance",
+            sample: WidgetData(title: "API Allowance", icon: provider.icon, kind: .percent, used: 0, limit: 100)
+        )
+        let runtime = TestProviderRuntime(
+            provider: provider,
+            descriptors: [descriptor],
+            snapshot: ProviderSnapshot(
+                providerID: provider.id,
+                displayName: provider.displayName,
+                lines: lines
+            )
+        )
+        let suiteName = "OpenUsageTests.MistralPace.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        let cache = ProviderSnapshotCache(userDefaults: defaults, storageKey: "snapshots", ttl: 600, now: { Date() })
+        let store = WidgetDataStore(
+            registry: WidgetRegistry(providers: [provider], descriptors: [descriptor]),
+            providers: [runtime],
+            cache: cache,
+            defaults: defaults
+        )
+        await store.refreshAll()
+        return (store, descriptor)
     }
 }
 
