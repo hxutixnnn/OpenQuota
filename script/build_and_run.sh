@@ -25,8 +25,8 @@ APP_DISPLAY="OpenQuota"                 # user-facing app name
 BUNDLE_ID="${BUNDLE_ID:-com.hxutixnnn.openquota.dev}"
 ICLOUD_CONTAINER_ID="iCloud.com.hxutixnnn.openquota.dev"
 MIN_SYSTEM_VERSION="15.0"
-APP_VERSION="0.7.16"
-APP_BUILD="0.7.16"
+APP_VERSION="0.7.17"
+APP_BUILD="0.7.17"
 APP_VERSION_SUFFIX="${APP_VERSION_SUFFIX--dev}"   # empty for a release build
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
