@@ -34,8 +34,8 @@ enum MistralUsageMapper {
     }
 
     /// One percent meter from an allowance object: `usage_percentage` is already a 0…100 figure.
-    /// `resetsAt` comes from `reset_at`; the cycle length varies by calendar month, so no
-    /// `periodDurationMs` is invented.
+    /// `resetsAt` comes from `reset_at`, and the window behind it is one calendar month, which lets
+    /// the row pace instead of falling back to plain level bands.
     private static func allowanceLine(_ budget: [String: Any], label: String) -> MetricLine? {
         guard let pct = ProviderParse.number(budget["usage_percentage"]),
               let budgetAmount = ProviderParse.number(budget["initial_budget"]),
@@ -46,7 +46,22 @@ enum MistralUsageMapper {
             used: ProviderParse.clampPercent(pct),
             limit: 100,
             format: .percent,
-            resetsAt: resetsAt
+            resetsAt: resetsAt,
+            periodDurationMs: resetsAt.flatMap(monthlyPeriodMs(endingAt:))
         )
+    }
+
+    /// How long the allowance window that ends at `resetsAt` runs: back to the same day one month
+    /// earlier. Without a period the row has a reset date but no window to burn evenly across, so
+    /// `WidgetData.meterState` can only report absolute level bands — no pace verdict, tick, or
+    /// run-out. Mistral refills on the same day each month, so a fixed 30-day constant would drift up
+    /// to a day on 28- and 31-day months and skew the projection. UTC, because `reset_at` is an
+    /// instant rather than a local midnight.
+    private static func monthlyPeriodMs(endingAt resetsAt: Date) -> Int? {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        guard let start = calendar.date(byAdding: .month, value: -1, to: resetsAt) else { return nil }
+        let milliseconds = Int((resetsAt.timeIntervalSince(start) * 1000).rounded())
+        return milliseconds > 0 ? milliseconds : nil
     }
 }
