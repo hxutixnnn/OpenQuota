@@ -134,8 +134,10 @@ final class PaceTests: XCTestCase {
     }
 
     func testSpentOutranksCloseToLimitSoNoTickOrSpare() {
+        // Percent keeps two decimals under 1% (so 0.4% left stays visible), which puts the spent
+        // threshold at a remainder under 0.005% — a balance that still prints "0.00% left".
         var data = WidgetData(title: "Weekly", icon: .providerMark("codex"), kind: .percent,
-                              used: 99.6, limit: 100)
+                              used: 99.999, limit: 100)
         data.resetsAt = resetsAt(elapsed: 0.997, period: week)
         data.periodDurationMs = Int(week * 1000)
         XCTAssertEqual(data.meterState(now: now), .spent)

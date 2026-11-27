@@ -29,7 +29,10 @@ enum MetricFormatter {
             // reporting a negative or >100 utilization) can never print "-5%" or "105%" on any
             // surface that formats through here. Over-limit is conveyed by the meter's spent state
             // and color (see `WidgetData.meterState`), not by an out-of-range headline number.
-            return "\(Int(ProviderParse.clampPercent(value).rounded()))%"
+            let precision = percentPrecision(value)
+            return precision.value.formatted(
+                .number.precision(.fractionLength(precision.digits)).locale(locale)
+            ) + "%"
         case .dollars:
             // Tray and row abbreviate four figures and up ("$1.2M", "$2.1K") so neither carries
             // "$2,059.07"; the full form (tooltips/headlines) always keeps grouped cents.
@@ -53,6 +56,43 @@ enum MetricFormatter {
             }
             return value.formatted(.number.precision(.fractionLength(0...1)).locale(locale))
         }
+    }
+
+    /// A percent reading's printed precision and its value rounded to that same precision, resolved in
+    /// one place so the headline text and the meter geometry can never disagree.
+    ///
+    /// Whole percents read cleanly for ordinary quota meters, but a large monthly allowance can sit at a
+    /// fraction of a percent of its cap (Mistral's API allowance is €25.50, so a few cents of usage is
+    /// 0.05%) — whole percent would print "0%" for weeks and the meter would look frozen. So the
+    /// precision follows the magnitude: whole at or above 10%, one decimal under 10, two under 1, and a
+    /// genuine zero stays "0%". A reading that rounds up into the next band drops the extra decimal
+    /// (9.96 → "10%", not "10.0%").
+    static func percentPrecision(_ value: Double) -> (digits: Int, value: Double) {
+        let clamped = ProviderParse.clampPercent(value)
+        var digits: Int
+        if clamped == 0 || clamped >= 10 {
+            digits = 0
+        } else if clamped >= 1 {
+            digits = 1
+        } else {
+            digits = 2
+        }
+        var rounded = roundedToDigits(clamped, digits)
+        if digits > 0, rounded >= 10 {
+            digits = 0
+            rounded = roundedToDigits(clamped, 0)
+        }
+        // A reading that rounds away at its own precision prints the plain zero, and the meter stays
+        // empty: "0%", never "0.00%" beside a hairline sliver of fill.
+        if rounded == 0 {
+            digits = 0
+        }
+        return (digits, rounded)
+    }
+
+    private static func roundedToDigits(_ value: Double, _ digits: Int) -> Double {
+        let scale = pow(10, Double(digits))
+        return (value * scale).rounded() / scale
     }
 
     /// A value with its unit label appended, e.g. "772 credits". Token, dollar, and percent values

@@ -195,7 +195,9 @@ final class WidgetDataStoreTests: XCTestCase {
 
     func testDonutFractionMatchesRoundedHeadline() {
         for (used, headline, fraction) in [
-            (0.3915, "0%", 0.0), (0.6, "1%", 0.01), (99.6, "100%", 1.0)
+            (0.3915, "0.39%", 0.0039), (0.6, "0.60%", 0.006), (99.6, "100%", 1.0),
+            // A reading that rounds to zero keeps an empty donut — no hairline sliver for "0%".
+            (0.004, "0%", 0.0)
         ] {
             let data = WidgetData(
                 title: "Total usage", icon: .providerMark("cursor"), kind: .percent,
@@ -204,6 +206,20 @@ final class WidgetDataStoreTests: XCTestCase {
             XCTAssertEqual(data.valueText, headline)
             XCTAssertEqual(data.fraction, fraction, accuracy: 0.0001)
         }
+    }
+
+    func testTrayPercentKeepsTheSamePrecisionAndClampAsThePopover() {
+        // The tray builds a percent reading from the meter's share, so it must format through the same
+        // rule: a Mistral allowance at 0.0481% reads "0.05%" pinned to the menu bar, not "0%".
+        let allowance = WidgetData(title: "API Allowance", icon: .providerMark("mistral"), kind: .percent,
+                                   used: 0.0481, limit: 100)
+        XCTAssertEqual(allowance.valueText, "0.05%")
+        XCTAssertEqual(allowance.menuBarValue, "0.05%")
+
+        // A provider sample over the limit still clamps to "100%" beside the icon.
+        let over = WidgetData(title: "Session", icon: .providerMark("claude"), kind: .percent,
+                              used: 130, limit: 100)
+        XCTAssertEqual(over.menuBarValue, "100%")
     }
 
     func testBoundedDollarSubtitlesAppendLimitNoun() {

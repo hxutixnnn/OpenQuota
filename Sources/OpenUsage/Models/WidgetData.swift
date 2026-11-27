@@ -215,12 +215,13 @@ struct WidgetData: Hashable {
         roundedAtDisplayPrecision(displayedValue)
     }
 
-    /// Rounds a value to the precision this kind shows in the headline — whole percent, one-decimal
-    /// count, or cents — so the meter geometry and the spent check never disagree with the printed
-    /// number. (A value that reads "0%" must register as zero, not a hairline sliver.)
+    /// Rounds a value to the precision this kind shows in the headline — percent (see
+    /// `MetricFormatter.percentPrecision`), one-decimal count, or cents — so the meter geometry and the
+    /// spent check never disagree with the printed number. (A value that reads "0%" must register as
+    /// zero, not a hairline sliver.)
     private func roundedAtDisplayPrecision(_ value: Double) -> Double {
         switch kind {
-        case .percent: return value.rounded()
+        case .percent: return MetricFormatter.percentPrecision(value).value
         case .count: return (value * 10).rounded() / 10
         case .dollars: return (value * 100).rounded() / 100
         }
@@ -249,10 +250,10 @@ struct WidgetData: Hashable {
         guard hasData else { return valueText }
         if let limit, limit > 0 {
             if kind == .percent {
-                // Percent is the only bounded unit that should collapse to a tray percentage. Clamp both
-                // ends so a provider sample can never print "-5%" or "105%" beside the icon.
-                let percent = min(100, max(0, Int((displayedValue / limit * 100).rounded())))
-                return "\(percent)%"
+                // Percent is the only bounded unit that should collapse to a tray percentage. It goes
+                // through the shared formatter so the tray keeps the popover's precision (0.05%, not
+                // "0%") and the same 0...100 clamp, instead of rounding on its own.
+                return MetricFormatter.number(displayedValue / limit * 100, kind: .percent, style: .tray)
             }
             return MetricFormatter.number(displayedValue, kind: kind, style: .tray)
         }
