@@ -20,12 +20,14 @@ reality.
 | **Antigravity Prompt / Flow credits** | The plan's own credit balances (`availablePromptCredits` / `availableFlowCredits`) become two percent meters, read from the local Antigravity agent. The quota buckets alone can read 100% while these are nearly gone. |
 | **Abacus.AI provider** | New provider that reads the usage your `abacusai` CLI already tracks (one `get_usage` request, no turn, no credits), instead of the per-user endpoint that returns null pools for enterprise orgs. The monthly row counts down to the 1st. |
 | **Devin Daily / Weekly pinned** | Both quota meters are in the menu bar on a fresh install instead of hiding in the popover. |
+| **Mistral provider** | Monthly API and Vibe & Studio allowances as percent meters, with pacing: the row projects where the month lands at reset and warns when the burn rate would exhaust it early. |
+| **openquota CLI** | The command-line helper installs as `openquota`, and installing it removes a stale pre-rebrand `openusage` link. |
 
 Everything else — providers, layout, CLI, local API — is upstream v0.7.16 behaviour.
 
 ## Install
 
-**Download:** grab `OpenQuota-0.7.16.zip` from the
+**Download:** grab `OpenQuota-0.7.17.zip` from the
 [latest release](https://github.com/hxutixnnn/OpenQuota/releases/latest), unzip it and drag
 `OpenQuota.app` to Applications. It is ad-hoc signed, not notarized: on first launch,
 right-click the app and choose **Open**.
