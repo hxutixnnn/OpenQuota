@@ -288,10 +288,14 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
     private func assertSummaryRequests(
         _ routing: RoutingHTTPClient, hosts: [String], file: StaticString = #filePath, line: UInt = #line
     ) {
-        XCTAssertEqual(
-            routing.requests.filter { $0.url.path == AntigravityUsageClient.quotaSummaryPath }.compactMap { $0.url.host },
-            hosts, file: file, line: line
-        )
+        // Both hosts are asked concurrently (`cloudCodeAllHosts`), and the client re-sorts the responses
+        // by URL index afterwards, so the order the requests land in this recorder is a race — asserting
+        // it flaked about one run in three. Compare the sorted host lists instead: that still fails on a
+        // missing host or a duplicate, which is what "ask every host, once" means.
+        let asked = routing.requests
+            .filter { $0.url.path == AntigravityUsageClient.quotaSummaryPath }
+            .compactMap { $0.url.host }
+        XCTAssertEqual(asked.sorted(), hosts.sorted(), file: file, line: line)
         XCTAssertFalse(routing.requests.contains {
             $0.url.path == AntigravityUsageClient.fetchModelsPath || $0.url.path == AntigravityUsageClient.retrieveQuotaPath
         }, "a parsed summary must not touch the legacy endpoints", file: file, line: line)
